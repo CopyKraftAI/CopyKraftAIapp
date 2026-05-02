@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CopyKraft AI — Generate Marketing Copy</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --gold: #C8821A;
+    --gold-light: #E8A030;
+    --gold-dim: #8A5610;
+    --gold-glow: rgba(200,130,26,0.15);
+    --bg: #0E0D0B;
+    --bg2: #131210;
+    --bg3: #1A1814;
+    --bg4: #211F1A;
+    --text: #F0EDE6;
+    --text2: #A09880;
+    --text3: #5A5446;
+    --border: rgba(200,130,26,0.18);
+    --border2: rgba(200,130,26,0.07);
+    --serif: 'DM Serif Display', Georgia, serif;
+    --sans: 'DM Sans', system-ui, sans-serif;
+    --radius: 10px;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { height: 100%; }
+  body {
+    font-family: var(--sans); background: var(--bg); color: var(--text);
+    min-height: 100vh; display: flex; flex-direction: column;
+    line-height: 1.6; overflow-x: hidden;
+  }
+
+  /* TOP BAR */
+  .topbar {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 28px; height: 58px;
+    border-bottom: 1px solid var(--border2);
+    background: rgba(14,13,11,0.9); backdrop-filter: blur(10px);
+    position: sticky; top: 0; z-index: 50;
+  }
+  .logo { display: flex; align-items: center; gap: 9px; text-decoration: none; }
+  .logo-mark {
+    width: 28px; height: 28px; background: var(--gold); border-radius: 5px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .logo-mark svg { width: 14px; height: 14px; fill: #0E0D0B; }
+  .logo-text { font-family: var(--serif); font-size: 17px; color: var(--text); }
+  .logo-text span { color: var(--gold); }
+  .topbar-right { display: flex; align-items: center; gap: 14px; }
+  .usage-pill {
+    font-size: 12px; color: var(--text3); background: var(--bg3);
+    border: 1px solid var(--border2); border-radius: 20px; padding: 4px 12px;
+  }
+  .usage-pill strong { color: var(--gold); }
+  .upgrade-btn {
+    background: var(--gold); color: #0E0D0B; border: none;
+    padding: 7px 16px; border-radius: 6px; font-size: 13px; font-weight: 500;
+    cursor: pointer; text-decoration: none; transition: background 0.2s;
+  }
+  .upgrade-btn:hover { background: var(--gold-light); }
+
+  /* LAYOUT */
+  .app-body { display: flex; flex: 1; min-height: 0; }
+  .sidebar {
+    width: 220px; flex-shrink: 0; border-right: 1px solid var(--border2);
+    padding: 20px 14px; display: flex; flex-direction: column; gap: 4px;
+    background: var(--bg2);
+  }
+  .sidebar-label {
+    font-size: 10px; color: var(--text3); text-transform: uppercase;
+    letter-spacing: 0.8px; padding: 0 8px; margin-bottom: 4px; margin-top: 8px;
+  }
+  .sidebar-label:first-child { margin-top: 0; }
+  .tool-item {
+    display: flex; align-items: center; gap: 10px; padding: 9px 10px;
+    border-radius: 7px; cursor: pointer; transition: all 0.15s;
+    color: var(--text2); font-size: 14px; border: 1px solid transparent;
+  }
+  .tool-item:hover { background: var(--bg3); color: var(--text); }
+  .tool-item.active { background: var(--gold-glow); border-color: var(--border); color: var(--text); }
+  .tool-icon { font-size: 15px; width: 20px; text-align: center; }
+  .tool-count {
+    margin-left: auto; font-size: 10px; background: var(--bg4);
+    border-radius: 3px; padding: 1px 5px; color: var(--text3);
+  }
+  .tool-item.active .tool-count { background: rgba(200,130,26,0.15); color: var(--gold); }
+
+  /* MAIN CONTENT */
+  .main { flex: 1; display: flex; flex-direction: column; min-width: 0; overflow-y: auto; }
+  .main-header { padding: 28px 32px 0; }
+  .main-title { font-family: var(--serif); font-size: 26px; margin-bottom: 4px; }
+  .main-sub { font-size: 14px; color: var(--text2); font-weight: 300; }
+
+  /* FORM */
+  .form-area { padding: 20px 32px; display: flex; flex-direction: column; gap: 14px; }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .form-group { display: flex; flex-direction: column; gap: 5px; }
+  label { font-size: 11px; color: var(--text3); text-transform: uppercase; letter-spacing: 0.5px; font-weight: 500; }
+  input, select, textarea {
+    background: var(--bg3); border: 1px solid var(--border2);
+    color: var(--text); border-radius: var(--radius); padding: 10px 13px;
+    font-family: var(--sans); font-size: 14px; outline: none;
+    transition: border-color 0.15s; width: 100%;
+  }
+  input::placeholder, textarea::placeholder { color: var(--text3); }
+  input:focus, select:focus, textarea:focus { border-color: var(--gold-dim); }
+  select option { background: var(--bg3); }
+  textarea { resize: vertical; min-height: 72px; line-height: 1.55; }
+
+  .generate-btn {
+    background: var(--gold); color: #0E0D0B; border: none;
+    padding: 12px 28px; border-radius: var(--radius); font-size: 15px;
+    font-weight: 500; cursor: pointer; transition: all 0.2s;
+    display: flex; align-items: center; gap: 8px; align-self: flex-start;
+  }
+  .generate-btn:hover { background: var(--gold-light); transform: translateY(-1px); }
+  .generate-btn:disabled { opacity: 0.45; cursor: not-allowed; transform: none; }
+  .btn-spinner { width: 16px; height: 16px; border: 2px solid rgba(0,0,0,0.2); border-top-color: #0E0D0B; border-radius: 50%; animation: spin 0.7s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* DIVIDER */
+  .divider { height: 1px; background: var(--border2); margin: 4px 32px; }
+
+  /* RESULTS */
+  .results-area { padding: 0 32px 32px; flex: 1; }
+  .results-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; padding-top: 20px; }
+  .results-title { font-size: 13px; color: var(--text3); text-transform: uppercase; letter-spacing: 0.5px; }
+  .copy-all-btn {
+    font-size: 12px; padding: 5px 12px; border: 1px solid var(--border2);
+    border-radius: 6px; background: transparent; cursor: pointer; color: var(--text3);
+    transition: all 0.15s;
+  }
+  .copy-all-btn:hover { border-color: var(--gold-dim); color: var(--gold); }
+
+  .results-grid { display: flex; flex-direction: column; gap: 10px; }
+  .result-card {
+    background: var(--bg3); border: 1px solid var(--border2); border-radius: var(--radius);
+    padding: 16px 18px; display: flex; gap: 14px; align-items: flex-start;
+    transition: border-color 0.15s; animation: fadeIn 0.3s ease both;
+  }
+  .result-card:hover { border-color: var(--border); }
+  @keyframes fadeIn { from { opacity:0; transform: translateY(8px); } to { opacity:1; transform:none; } }
+  .result-num { font-family: var(--serif); font-size: 22px; color: var(--gold); opacity: 0.5; min-width: 28px; line-height: 1; margin-top: 2px; }
+  .result-text { flex: 1; font-size: 14px; line-height: 1.7; color: var(--text); }
+  .result-copy {
+    padding: 5px 10px; border: 1px solid var(--border2); border-radius: 6px;
+    background: transparent; font-size: 11px; cursor: pointer; color: var(--text3);
+    flex-shrink: 0; transition: all 0.15s; white-space: nowrap;
+  }
+  .result-copy:hover { border-color: var(--gold-dim); color: var(--gold); }
+  .result-copy.copied { color: #5A9E3A; border-color: #3A6A20; }
+
+  /* EMPTY STATE */
+  .empty-state { text-align: center; padding: 60px 20px; color: var(--text3); }
+  .empty-icon { font-size: 32px; margin-bottom: 12px; opacity: 0.3; }
+  .empty-text { font-size: 14px; font-weight: 300; }
+
+  /* LOADING */
+  .loading-state { display: flex; gap: 6px; justify-content: center; padding: 48px; }
+  .ldot { width: 8px; height: 8px; border-radius: 50%; background: var(--gold); opacity: 0.3; animation: ldot 1.2s ease-in-out infinite; }
+  .ldot:nth-child(2) { animation-delay: 0.2s; }
+  .ldot:nth-child(3) { animation-delay: 0.4s; }
+  @keyframes ldot { 0%,100%{opacity:0.3;transform:scale(0.8)} 50%{opacity:1;transform:scale(1.1)} }
+
+  /* UPGRADE MODAL */
+  .modal-overlay {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 200;
+    display: flex; align-items: center; justify-content: center; padding: 20px;
+    backdrop-filter: blur(4px); animation: fadeIn 0.2s ease;
+  }
+  .modal {
+    background: var(--bg3); border: 1px solid var(--border);
+    border-radius: 16px; padding: 36px; max-width: 460px; width: 100%;
+    text-align: center;
+  }
+  .modal-icon { font-size: 36px; margin-bottom: 16px; }
+  .modal-title { font-family: var(--serif); font-size: 28px; margin-bottom: 8px; }
+  .modal-sub { font-size: 15px; color: var(--text2); font-weight: 300; margin-bottom: 28px; line-height: 1.6; }
+  .modal-plans { display: flex; gap: 12px; margin-bottom: 20px; }
+  .modal-plan {
+    flex: 1; background: var(--bg4); border: 1px solid var(--border2);
+    border-radius: 10px; padding: 20px 16px; text-align: center;
+    text-decoration: none; transition: all 0.2s; display: block;
+  }
+  .modal-plan:hover { border-color: var(--gold-dim); transform: translateY(-2px); }
+  .modal-plan.featured { border-color: var(--gold); background: var(--gold-glow); }
+  .modal-plan-name { font-size: 12px; color: var(--text3); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
+  .modal-plan-price { font-family: var(--serif); font-size: 32px; color: var(--text); margin-bottom: 4px; }
+  .modal-plan-price span { font-family: var(--sans); font-size: 14px; color: var(--text3); }
+  .modal-plan-cta {
+    display: block; margin-top: 14px; padding: 9px; border-radius: 7px;
+    font-size: 13px; font-weight: 500; text-decoration: none;
+    background: var(--gold); color: #0E0D0B; transition: background 0.2s;
+  }
+  .modal-plan.featured .modal-plan-cta { background: var(--gold); }
+  .modal-plan-cta:hover { background: var(--gold-light); }
+  .modal-plan-ghost .modal-plan-cta { background: var(--bg3); color: var(--text); border: 1px solid var(--border); }
+  .modal-dismiss { font-size: 13px; color: var(--text3); cursor: pointer; background: none; border: none; text-decoration: underline; }
+  .modal-dismiss:hover { color: var(--text2); }
+
+  /* ERROR */
+  .error-box { background: rgba(160,40,40,0.12); border: 1px solid rgba(160,40,40,0.3); border-radius: var(--radius); padding: 14px 16px; font-size: 14px; color: #D08080; }
+
+  /* LOGIN GATE */
+  .login-gate {
+    position: fixed; inset: 0; background: var(--bg); z-index: 300;
+    display: flex; align-items: center; justify-content: center;
+    padding: 20px; animation: fadeIn 0.3s ease;
+  }
+  .login-box {
+    background: var(--bg3); border: 1px solid var(--border);
+    border-radius: 16px; padding: 40px 36px; max-width: 420px; width: 100%;
+    text-align: center;
+  }
+  .login-logo { display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 28px; }
+  .login-logo-mark { width: 34px; height: 34px; background: var(--gold); border-radius: 7px; display: flex; align-items: center; justify-content: center; }
+  .login-logo-mark svg { width: 18px; height: 18px; fill: #0E0D0B; }
+  .login-logo-text { font-family: var(--serif); font-size: 22px; color: var(--text); }
+  .login-logo-text span { color: var(--gold); }
+  .login-title { font-family: var(--serif); font-size: 26px; margin-bottom: 8px; }
+  .login-sub { font-size: 14px; color: var(--text2); font-weight: 300; margin-bottom: 28px; line-height: 1.6; }
+  .login-form { display: flex; flex-direction: column; gap: 12px; text-align: left; }
+  .login-form input {
+    background: var(--bg4); border: 1px solid var(--border2);
+    color: var(--text); border-radius: 8px; padding: 12px 14px;
+    font-size: 15px; outline: none; transition: border-color 0.15s; width: 100%;
+  }
+  .login-form input:focus { border-color: var(--gold-dim); }
+  .login-submit {
+    background: var(--gold); color: #0E0D0B; border: none;
+    padding: 13px; border-radius: 8px; font-size: 15px; font-weight: 500;
+    cursor: pointer; transition: background 0.2s; width: 100%; margin-top: 4px;
+  }
+  .login-submit:hover { background: var(--gold-light); }
+  .login-submit:disabled { opacity: 0.5; cursor: not-allowed; }
+  .login-toggle { margin-top: 16px; font-size: 13px; color: var(--text3); }
+  .login-toggle a { color: var(--gold); cursor: pointer; text-decoration: underline; }
+  .login-error { font-size: 13px; color: #D08080; background: rgba(160,40,40,0.1); border: 1px solid rgba(160,40,40,0.2); border-radius: 6px; padding: 10px 12px; display: none; }
+  .login-success { font-size: 13px; color: #7ABA50; background: rgba(80,160,40,0.1); border: 1px solid rgba(80,160,40,0.2); border-radius: 6px; padding: 10px 12px; display: none; }
+
+  @media(max-width: 640px) {
+    .sidebar { display: none; }
+    .form-row { grid-template-columns: 1fr; }
+    .form-area, .results-area, .main-header { padding-left: 16px; padding-right: 16px; }
+    .modal-plans { flex-direction: column; }
+  }
+</style>
+</head>
+<body>
+
+<!-- LOGIN GATE -->
+<div class="login-gate" id="loginGate">
+  <div class="login-box">
+    <div class="login-logo">
+      <div class="login-logo-mark">
+        <svg viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zm17.71-10.21a1 1 0 0 0 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
+      </div>
+      <span class="login-logo-text">Copy<span>Kraft</span> AI</span>
+    </div>
+    <h2 class="login-title" id="authTitle">Welcome back</h2>
+    <p class="login-sub" id="authSub">Sign in to your free account to start generating copy</p>
+    <div class="login-form">
+      <div class="login-error" id="authError"></div>
+      <div class="login-success" id="authSuccess"></div>
+      <input type="email" id="authEmail" placeholder="Email address" autocomplete="email" />
+      <input type="password" id="authPassword" placeholder="Password (min 8 characters)" autocomplete="current-password" />
+      <button class="login-submit" id="authSubmit" onclick="handleAuth()">Sign in</button>
+    </div>
+    <div class="login-toggle" id="authToggle">
+      No account yet? <a onclick="toggleAuthMode()">Sign up free</a>
+    </div>
+  </div>
+</div>
+
+<!-- TOP BAR -->
+<div class="topbar">
+  <a href="https://copykraftai.netlify.app" class="logo">
+    <div class="logo-mark">
+      <svg viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zm17.71-10.21a1 1 0 0 0 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
+    </div>
+    <span class="logo-text">Copy<span>Kraft</span> AI</span>
+  </a>
+  <div class="topbar-right">
+    <div class="usage-pill">Free: <strong id="usageDisplay">20</strong> generations left</div>
+    <span id="userEmail" style="font-size:13px;color:var(--text3);"></span>
+    <button onclick="signOut()" style="font-size:13px;color:var(--text3);background:none;border:none;cursor:pointer;text-decoration:underline;" id="logoutBtn">Sign out</button>
+    <a href="https://buy.stripe.com/eVqfZha7W0Ts2t1599aIM01" target="_blank" class="upgrade-btn">Upgrade to Pro →</a>
+  </div>
+</div>
+
+<!-- APP BODY -->
+<div class="app-body">
+
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="sidebar-label">Copy Tools</div>
+    <div class="tool-item active" data-tool="ad" onclick="selectTool(this)">
+      <span class="tool-icon">✦</span> Ad Copy <span class="tool-count">×4</span>
+    </div>
+    <div class="tool-item" data-tool="email" onclick="selectTool(this)">
+      <span class="tool-icon">◎</span> Email Subjects <span class="tool-count">×6</span>
+    </div>
+    <div class="tool-item" data-tool="product" onclick="selectTool(this)">
+      <span class="tool-icon">▣</span> Product Desc. <span class="tool-count">×3</span>
+    </div>
+    <div class="tool-item" data-tool="social" onclick="selectTool(this)">
+      <span class="tool-icon">◈</span> Social Posts <span class="tool-count">×4</span>
+    </div>
+    <div class="tool-item" data-tool="tagline" onclick="selectTool(this)">
+      <span class="tool-icon">❋</span> Taglines <span class="tool-count">×6</span>
+    </div>
+    <div class="tool-item" data-tool="cold" onclick="selectTool(this)">
+      <span class="tool-icon">→</span> Cold Outreach <span class="tool-count">×4</span>
+    </div>
+  </div>
+
+  <!-- MAIN -->
+  <div class="main">
+    <div class="main-header">
+      <h1 class="main-title" id="mainTitle">Ad Copy</h1>
+      <p class="main-sub" id="mainSub">Generate 4 high-converting ad variants for Facebook, Instagram & Google</p>
+    </div>
+
+    <div class="form-area">
+      <div class="form-row">
+        <div class="form-group">
+          <label>Brand / Business name</label>
+          <input type="text" id="brand" placeholder="e.g. CopyKraft AI" />
+        </div>
+        <div class="form-group">
+          <label>Product or service</label>
+          <input type="text" id="product" placeholder="e.g. AI copywriting tool" />
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Target audience</label>
+          <input type="text" id="audience" placeholder="e.g. Marketing managers, freelancers" />
+        </div>
+        <div class="form-group">
+          <label>Tone</label>
+          <select id="tone">
+            <option>Professional</option>
+            <option>Conversational</option>
+            <option>Playful</option>
+            <option>Luxury / Premium</option>
+            <option>Urgent / Bold</option>
+            <option>Friendly & Warm</option>
+            <option>Witty</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Key benefit / Unique selling point</label>
+        <textarea id="usp" placeholder="e.g. Generates 4–6 copy variants in seconds. Saves 10+ hours per week. No writing experience needed."></textarea>
+      </div>
+      <button class="generate-btn" id="genBtn" onclick="generate()">
+        <span id="btnLabel">Generate copy</span>
+      </button>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="results-area">
+      <div class="results-header">
+        <span class="results-title" id="resultsTitle">Output</span>
+        <button class="copy-all-btn" id="copyAllBtn" style="display:none" onclick="copyAll()">Copy all</button>
+      </div>
+      <div id="resultsBody">
+        <div class="empty-state">
+          <div class="empty-icon">✦</div>
+          <div class="empty-text">Fill in your details above and click Generate</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- UPGRADE MODAL -->
+<div class="modal-overlay" id="upgradeModal" style="display:none">
+  <div class="modal">
+    <div class="modal-icon">✦</div>
+    <h2 class="modal-title">You've used your free generations</h2>
+    <p class="modal-sub">Upgrade to Pro for unlimited copy generation, all tone settings, and priority speed.</p>
+    <div class="modal-plans">
+      <div class="modal-plan featured">
+        <div class="modal-plan-name">Pro</div>
+        <div class="modal-plan-price">$29<span>/mo</span></div>
+        <div style="font-size:12px;color:var(--text2);margin-top:4px">Unlimited generations</div>
+        <a href="https://buy.stripe.com/eVqfZha7W0Ts2t1599aIM01" target="_blank" class="modal-plan-cta">Start Pro →</a>
+      </div>
+      <div class="modal-plan modal-plan-ghost">
+        <div class="modal-plan-name">Agency</div>
+        <div class="modal-plan-price">$99<span>/mo</span></div>
+        <div style="font-size:12px;color:var(--text2);margin-top:4px">5 seats + API access</div>
+        <a href="https://buy.stripe.com/6oU6oH5RG1Xw5FdgRRaIM00" target="_blank" class="modal-plan-cta">Start Agency →</a>
+      </div>
+    </div>
+    <button class="modal-dismiss" onclick="document.getElementById('upgradeModal').style.display='none'">Maybe later</button>
+  </div>
+</div>
+
+<script>
+// SUPABASE AUTH
+const SUPABASE_URL = 'https://cwzvnlwbotgwjlxagglp.supabase.co';
+const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN3enZubHdib3Rnd2pseGFnZ2xwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc2NTk5MjAsImV4cCI6MjA5MzIzNTkyMH0.mi8_q-pKkbVREgNzjoaF3GPQSOsqV15aIPnOKWiTenA';
+const sbClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+
+let isSignup = false;
+
+function toggleAuthMode() {
+  isSignup = !isSignup;
+  document.getElementById('authTitle').textContent = isSignup ? 'Create your free account' : 'Welcome back';
+  document.getElementById('authSub').textContent = isSignup ? 'Free forever — 20 generations per month, no credit card needed' : 'Sign in to your free account to start generating copy';
+  document.getElementById('authSubmit').textContent = isSignup ? 'Create account' : 'Sign in';
+  document.getElementById('authToggle').innerHTML = isSignup ? 'Already have an account? <a onclick="toggleAuthMode()">Sign in</a>' : 'No account yet? <a onclick="toggleAuthMode()">Sign up free</a>';
+  document.getElementById('authError').style.display = 'none';
+  document.getElementById('authSuccess').style.display = 'none';
+}
+
+async function handleAuth() {
+  const email = document.getElementById('authEmail').value.trim();
+  const password = document.getElementById('authPassword').value;
+  const errEl = document.getElementById('authError');
+  const sucEl = document.getElementById('authSuccess');
+  const btn = document.getElementById('authSubmit');
+
+  errEl.style.display = 'none';
+  sucEl.style.display = 'none';
+
+  if (!email || !password) { errEl.textContent = 'Please enter your email and password.'; errEl.style.display = 'block'; return; }
+  if (password.length < 8) { errEl.textContent = 'Password must be at least 8 characters.'; errEl.style.display = 'block'; return; }
+
+  btn.disabled = true;
+  btn.textContent = isSignup ? 'Creating account...' : 'Signing in...';
+
+  if (isSignup) {
+    const { error } = await sbClient.auth.signUp({ email, password });
+    if (error) {
+      errEl.textContent = error.message; errEl.style.display = 'block';
+    } else {
+      sucEl.textContent = 'Account created! Check your email to confirm, then sign in.';
+      sucEl.style.display = 'block';
+      toggleAuthMode();
+    }
+  } else {
+    const { data, error } = await sbClient.auth.signInWithPassword({ email, password });
+    if (error) {
+      errEl.textContent = error.message; errEl.style.display = 'block';
+    } else {
+      showApp(data.user);
+    }
+  }
+
+  btn.disabled = false;
+  btn.textContent = isSignup ? 'Create account' : 'Sign in';
+}
+
+function showApp(user) {
+  document.getElementById('loginGate').style.display = 'none';
+  const emailEl = document.getElementById('userEmail');
+  if (emailEl) emailEl.textContent = user.email;
+}
+
+async function signOut() {
+  await sbClient.auth.signOut();
+  document.getElementById('loginGate').style.display = 'flex';
+  document.getElementById('userEmail').textContent = '';
+}
+
+// Check session on load
+window.addEventListener('load', async () => {
+  const { data: { session } } = await sbClient.auth.getSession();
+  if (session) {
+    showApp(session.user);
+  } else {
+    document.getElementById('loginGate').style.display = 'flex';
+  }
+});
+
+// Allow Enter key to submit
+document.addEventListener('keydown', e => {
+  if (e.key === 'Enter' && document.getElementById('loginGate').style.display !== 'none') handleAuth();
+});
+
+const FREE_LIMIT = 20;
+const TOOLS = {
+  ad:      { title: 'Ad Copy',             sub: 'Generate 4 high-converting ad variants for Facebook, Instagram & Google', count: 4 },
+  email:   { title: 'Email Subject Lines', sub: 'Generate 6 subject lines engineered for high open rates', count: 6 },
+  product: { title: 'Product Description', sub: 'Generate 3 sensory, benefit-first product descriptions', count: 3 },
+  social:  { title: 'Social Media Posts',  sub: 'Generate 4 platform-native captions with hashtags', count: 4 },
+  tagline: { title: 'Taglines & Slogans',  sub: 'Generate 6 memorable brand taglines', count: 6 },
+  cold:    { title: 'Cold Outreach',        sub: 'Generate 4 cold email openers that actually get replies', count: 4 },
+};
+
+let currentTool = 'ad';
+let results = [];
+let usageLeft = parseInt(localStorage.getItem('ck_usage') ?? FREE_LIMIT);
+
+function updateUsageDisplay() {
+  const el = document.getElementById('usageDisplay');
+  if (el) el.textContent = Math.max(0, usageLeft);
+}
+updateUsageDisplay();
+
+function selectTool(el) {
+  document.querySelectorAll('.tool-item').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  currentTool = el.dataset.tool;
+  const t = TOOLS[currentTool];
+  document.getElementById('mainTitle').textContent = t.title;
+  document.getElementById('mainSub').textContent = t.sub;
+  clearResults();
+}
+
+function clearResults() {
+  results = [];
+  document.getElementById('copyAllBtn').style.display = 'none';
+  document.getElementById('resultsTitle').textContent = 'Output';
+  document.getElementById('resultsBody').innerHTML = `<div class="empty-state"><div class="empty-icon">✦</div><div class="empty-text">Fill in your details above and click Generate</div></div>`;
+}
+
+function getPrompt() {
+  const brand   = document.getElementById('brand').value.trim()   || 'the brand';
+  const product = document.getElementById('product').value.trim() || 'the product';
+  const audience= document.getElementById('audience').value.trim()|| 'general audience';
+  const tone    = document.getElementById('tone').value;
+  const usp     = document.getElementById('usp').value.trim()     || '';
+  const n       = TOOLS[currentTool].count;
+
+  const map = {
+    ad:      `Write ${n} distinct ad copy variants (Facebook/Instagram/Google style) for:\nBrand: ${brand}\nProduct: ${product}\nTarget audience: ${audience}\nTone: ${tone}\nUSP: ${usp}\n\nEach variant must have a punchy hook, a clear benefit, and a CTA. Max 60 words each. Number them 1–${n}.`,
+    email:   `Write ${n} email subject lines for:\nBrand: ${brand}\nProduct: ${product}\nAudience: ${audience}\nTone: ${tone}\nUSP: ${usp}\n\nMix curiosity, urgency, personalisation, and value-based angles. Number them 1–${n}.`,
+    product: `Write ${n} product description variants for:\nBrand: ${brand}\nProduct: ${product}\nAudience: ${audience}\nTone: ${tone}\nUSP: ${usp}\n\nEach 50–80 words, sensory and benefit-focused. Number them 1–${n}.`,
+    social:  `Write ${n} social media captions for Instagram, LinkedIn, and X for:\nBrand: ${brand}\nProduct: ${product}\nAudience: ${audience}\nTone: ${tone}\nUSP: ${usp}\n\nInclude relevant hashtags. Number them 1–${n}.`,
+    tagline: `Write ${n} brand taglines/slogans for:\nBrand: ${brand}\nProduct: ${product}\nAudience: ${audience}\nTone: ${tone}\nUSP: ${usp}\n\nShort, memorable, brand-defining. Number them 1–${n}.`,
+    cold:    `Write ${n} cold outreach email opening lines for:\nBrand: ${brand}\nProduct: ${product}\nAudience: ${audience}\nTone: ${tone}\nUSP: ${usp}\n\n1–2 sentences each. Hook immediately, don't be generic. Number them 1–${n}.`,
+  };
+  return map[currentTool];
+}
+
+async function generate() {
+  if (usageLeft <= 0) {
+    document.getElementById('upgradeModal').style.display = 'flex';
+    return;
+  }
+
+  const btn = document.getElementById('genBtn');
+  const lbl = document.getElementById('btnLabel');
+  btn.disabled = true;
+  lbl.innerHTML = '<span class="btn-spinner"></span> Generating...';
+  document.getElementById('copyAllBtn').style.display = 'none';
+  document.getElementById('resultsBody').innerHTML = '<div class="loading-state"><div class="ldot"></div><div class="ldot"></div><div class="ldot"></div></div>';
+
+  try {
+    const res = await fetch('/.netlify/functions/gemini', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ prompt: getPrompt() })
+    });
+    const data = await res.json();
+    const text = data.text || '';
+    if (!text) throw new Error('Empty response');
+
+    // Decrement usage
+    usageLeft = Math.max(0, usageLeft - 1);
+    localStorage.setItem('ck_usage', usageLeft);
+    updateUsageDisplay();
+
+    renderResults(text);
+  } catch(e) {
+    document.getElementById('resultsBody').innerHTML = `<div class="error-box">Something went wrong — please try again. If the issue persists, check your connection.</div>`;
+  }
+
+  btn.disabled = false;
+  lbl.textContent = 'Generate copy';
+}
+
+function renderResults(text) {
+  const lines = text.split('\n').filter(l => l.trim());
+  results = [];
+  let cur = '';
+  for (const line of lines) {
+    if (/^\d+[\.\):\-]/.test(line.trim())) {
+      if (cur) results.push(cur.trim());
+      cur = line.replace(/^\d+[\.\):\-]\s*/, '').trim();
+    } else {
+      cur += (cur ? ' ' : '') + line.trim();
+    }
+  }
+  if (cur) results.push(cur.trim());
+  if (!results.length) results = [text.trim()];
+
+  const t = TOOLS[currentTool];
+  document.getElementById('resultsTitle').textContent = `${t.title} — ${results.length} variants`;
+  document.getElementById('copyAllBtn').style.display = 'inline-block';
+
+  document.getElementById('resultsBody').innerHTML = `<div class="results-grid">${
+    results.map((r, i) => `
+      <div class="result-card" style="animation-delay:${i * 0.06}s">
+        <span class="result-num">${String(i+1).padStart(2,'0')}</span>
+        <span class="result-text">${r.replace(/\n/g,'<br>')}</span>
+        <button class="result-copy" onclick="copyOne(this,${i})">Copy</button>
+      </div>`).join('')
+  }</div>`;
+
+  // Show upgrade nudge if running low
+  if (usageLeft <= 5 && usageLeft > 0) {
+    document.getElementById('resultsBody').insertAdjacentHTML('afterbegin',
+      `<div style="margin-bottom:12px;padding:10px 14px;background:rgba(200,130,26,0.07);border:1px solid var(--border);border-radius:var(--radius);font-size:13px;color:var(--text2)">
+        ⚡ <strong style="color:var(--gold)">${usageLeft} free generation${usageLeft===1?'':'s'} left.</strong>
+        <a href="https://buy.stripe.com/eVqfZha7W0Ts2t1599aIM01" target="_blank" style="color:var(--gold);text-decoration:underline;margin-left:4px">Upgrade to Pro for unlimited →</a>
+      </div>`
+    );
+  }
+}
+
+function copyOne(btn, idx) {
+  navigator.clipboard.writeText(results[idx]).then(() => {
+    btn.textContent = 'Copied!'; btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = 'Copy'; btn.classList.remove('copied'); }, 1800);
+  });
+}
+
+function copyAll() {
+  navigator.clipboard.writeText(results.join('\n\n')).then(() => {
+    const btn = document.getElementById('copyAllBtn');
+    btn.textContent = 'Copied all!';
+    setTimeout(() => btn.textContent = 'Copy all', 2000);
+  });
+}
+</script>
+</body>
+</html>

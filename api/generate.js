@@ -1,14 +1,19 @@
 export default async function handler(req, res) {
-  if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Method not allowed' });
-  }
   try {
-    let body = req.body;
-    if (typeof body === 'string') body = JSON.parse(body);
-    const prompt = body?.prompt || '';
+    let prompt = '';
     
-    console.log('Prompt received:', prompt?.slice(0, 50));
-    console.log('API Key exists:', !!process.env.ANTHROPIC_KEY);
+    if (req.body && req.body.prompt) {
+      prompt = req.body.prompt;
+    } else if (typeof req.body === 'string') {
+      prompt = JSON.parse(req.body).prompt;
+    }
+
+    console.log('Key:', !!process.env.ANTHROPIC_KEY);
+    console.log('Prompt length:', prompt.length);
+
+    if (!prompt) {
+      return res.status(400).json({ error: 'No prompt' });
+    }
 
     const response = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
@@ -25,12 +30,12 @@ export default async function handler(req, res) {
     });
 
     const data = await response.json();
-    console.log('Anthropic response:', JSON.stringify(data));
-    
+    console.log('Response:', JSON.stringify(data).slice(0, 100));
     const text = data?.content?.[0]?.text || '';
     res.status(200).json({ text });
+
   } catch(e) {
-    console.error('Error:', e.message);
+    console.error('Caught error:', e.message);
     res.status(500).json({ error: e.message });
   }
 }

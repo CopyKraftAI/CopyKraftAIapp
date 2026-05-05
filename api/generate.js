@@ -10,11 +10,11 @@ export default async function handler(req, res) {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      'x-api-key': process.env.ANTHROPIC_KEY,
+      'x-api-key': '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',
       'anthropic-version': '2023-06-01'
     },
     body: JSON.stringify({
-      model: 'claude-haiku-4-5-20251001',      
+      model: 'claude-haiku-4-5-20251001',
       max_tokens: 1000,
       messages: [{ role: 'user', content: prompt }]
     })

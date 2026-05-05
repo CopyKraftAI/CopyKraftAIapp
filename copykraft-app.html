@@ -279,7 +279,7 @@
 
 <!-- TOP BAR -->
 <div class="topbar">
-  <a href="https://copykraftai.netlify.app" class="logo">
+  <a href="https://copykraftai.vercel.app" class="logo">
     <div class="logo-mark">
       <svg viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zm17.71-10.21a1 1 0 0 0 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
     </div>
@@ -558,13 +558,22 @@ async function generate() {
   document.getElementById('resultsBody').innerHTML = '<div class="loading-state"><div class="ldot"></div><div class="ldot"></div><div class="ldot"></div></div>';
 
   try {
-    const res = await fetch('/.netlify/functions/gemini', {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ prompt: getPrompt() })
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': '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',
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true'
+      },
+      body: JSON.stringify({
+        model: 'claude-haiku-4-5-20251001',
+        max_tokens: 1000,
+        messages: [{ role: 'user', content: getPrompt() }]
+      })
     });
     const data = await res.json();
-    const text = data.text || '';
+    const text = data.content?.map(b => b.text || '').join('\n') || '';
     if (!text) throw new Error('Empty response');
 
     // Decrement usage

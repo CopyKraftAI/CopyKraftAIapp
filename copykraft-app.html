@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -446,6 +447,7 @@ async function handleAuth() {
     } else {
       sucEl.textContent = 'Account created! Check your email to confirm, then sign in.';
       sucEl.style.display = 'block';
+      addToMailerLite(email);
       toggleAuthMode();
     }
   } else {
@@ -459,6 +461,18 @@ async function handleAuth() {
 
   btn.disabled = false;
   btn.textContent = isSignup ? 'Create account' : 'Sign in';
+}
+
+async function addToMailerLite(email) {
+  try {
+    await fetch('/api/subscribe', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email })
+    });
+  } catch(e) {
+    console.log('MailerLite error:', e);
+  }
 }
 
 function showApp(user) {

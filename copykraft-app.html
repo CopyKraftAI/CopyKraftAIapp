@@ -244,8 +244,26 @@
   .login-error { font-size: 13px; color: #D08080; background: rgba(160,40,40,0.1); border: 1px solid rgba(160,40,40,0.2); border-radius: 6px; padding: 10px 12px; display: none; }
   .login-success { font-size: 13px; color: #7ABA50; background: rgba(80,160,40,0.1); border: 1px solid rgba(80,160,40,0.2); border-radius: 6px; padding: 10px 12px; display: none; }
 
+  .mobile-tools { display: none; }
+
   @media(max-width: 640px) {
     .sidebar { display: none; }
+    .mobile-tools {
+      display: flex; gap: 8px; overflow-x: auto; padding: 10px 16px;
+      border-bottom: 1px solid var(--border2); background: var(--bg2);
+      scrollbar-width: none; -ms-overflow-style: none; flex-shrink: 0;
+    }
+    .mobile-tools::-webkit-scrollbar { display: none; }
+    .mobile-tool-btn {
+      flex-shrink: 0; padding: 6px 14px; border-radius: 20px;
+      border: 1px solid var(--border2); background: transparent;
+      font-size: 12px; color: var(--text2); cursor: pointer;
+      font-family: var(--sans); white-space: nowrap; transition: all 0.15s;
+    }
+    .mobile-tool-btn.active {
+      background: var(--gold); color: #0E0D0B;
+      border-color: var(--gold); font-weight: 500;
+    }
     .form-row { grid-template-columns: 1fr; }
     .form-area, .results-area, .main-header { padding-left: 16px; padding-right: 16px; }
     .modal-plans { flex-direction: column; }
@@ -292,6 +310,16 @@
     <button onclick="signOut()" style="font-size:13px;color:var(--text2);background:none;border:none;cursor:pointer;text-decoration:underline;" id="logoutBtn">Sign out</button>
     <a href="https://buy.stripe.com/9B6cN7a4zdNQb8eeklfQI00" target="_blank" class="upgrade-btn">Upgrade to Pro →</a>
   </div>
+</div>
+
+<!-- MOBILE TOOL BAR -->
+<div class="mobile-tools" id="mobileTools">
+  <button class="mobile-tool-btn active" data-tool="ad" onclick="selectMobileTool(this)">Ad Copy</button>
+  <button class="mobile-tool-btn" data-tool="email" onclick="selectMobileTool(this)">Email Subjects</button>
+  <button class="mobile-tool-btn" data-tool="product" onclick="selectMobileTool(this)">Product Desc.</button>
+  <button class="mobile-tool-btn" data-tool="social" onclick="selectMobileTool(this)">Social Posts</button>
+  <button class="mobile-tool-btn" data-tool="tagline" onclick="selectMobileTool(this)">Taglines</button>
+  <button class="mobile-tool-btn" data-tool="cold" onclick="selectMobileTool(this)">Cold Outreach</button>
 </div>
 
 <!-- APP BODY -->
@@ -407,6 +435,14 @@
 </div>
 
 <script>
+function selectMobileTool(el) {
+  document.querySelectorAll('.mobile-tool-btn').forEach(function(b) { b.classList.remove('active'); });
+  el.classList.add('active');
+  var tool = el.dataset.tool;
+  var sidebarItem = document.querySelector('.tool-item[data-tool="' + tool + '"]');
+  if (sidebarItem) selectTool(sidebarItem);
+}
+
 // SUPABASE AUTH
 const SUPABASE_URL = 'https://cwzvnlwbotgwjlxagglp.supabase.co';
 const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN3enZubHdib3Rnd2pseGFnZ2xwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc2NTk5MjAsImV4cCI6MjA5MzIzNTkyMH0.mi8_q-pKkbVREgNzjoaF3GPQSOsqV15aIPnOKWiTenA';

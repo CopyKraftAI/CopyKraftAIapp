@@ -163,6 +163,21 @@
   .login-error{font-size:13px;color:#D08080;background:rgba(160,40,40,0.08);border:1px solid rgba(160,40,40,0.2);border-radius:6px;padding:10px 12px;display:none}
   .login-success{font-size:13px;color:#7ABA50;background:rgba(80,160,40,0.08);border:1px solid rgba(80,160,40,0.2);border-radius:6px;padding:10px 12px;display:none}
 
+  /* PROFILE SECTION */
+  .profile-bar{display:flex;align-items:center;gap:8px;background:var(--bg2);border:1px solid var(--border2);border-radius:var(--radius);padding:8px 12px;margin-bottom:4px}
+  .profile-select{flex:1;background:transparent;border:none;color:var(--text);font-size:13px;font-family:var(--sans);outline:none;cursor:pointer}
+  .profile-select option{background:var(--bg2);color:var(--text)}
+  .profile-name-input{flex:1;background:transparent;border:none;color:var(--text);font-size:13px;font-family:var(--sans);outline:none;padding:0}
+  .profile-name-input::placeholder{color:var(--text3)}
+  .profile-action-btn{padding:5px 10px;border-radius:6px;font-size:11px;font-weight:500;cursor:pointer;border:none;transition:all 0.15s;white-space:nowrap}
+  .profile-save-main{background:var(--gold);color:#0E0D0B}
+  .profile-save-main:hover{background:var(--gold-light)}
+  .profile-load-main{background:transparent;color:var(--gold);border:1px solid var(--border)!important;border:none}
+  .profile-load-main:hover{background:var(--gold-glow)}
+  .profile-saved-msg{font-size:11px;color:#7ABA50;display:none}
+  .profile-pro-hint{font-size:11px;color:var(--text3)}
+  .profile-pro-hint a{color:var(--gold);cursor:pointer;text-decoration:underline}
+
   /* PRO LOCKS */
   .pro-badge{background:rgba(200,130,26,0.2);color:var(--gold);font-weight:500}
   .pro-tool{opacity:0.7}
@@ -275,31 +290,7 @@
     <div class="tool-item pro-tool" data-tool="bio" onclick="selectTool(this)"><span class="tool-icon">◉</span> Bio / About <span class="tool-count pro-badge">Pro</span></div>
     <div class="tool-item pro-tool" data-tool="cta" onclick="selectTool(this)"><span class="tool-icon">⚡</span> CTA Buttons <span class="tool-count pro-badge">Pro</span></div>
 
-    <div class="sidebar-label">Brand Profile</div>
-    <div class="brand-profile">
-      <div class="brand-profile-title">
-        <span>Saved Profile</span>
-        <span id="profileStatus" style="font-size:10px;color:var(--text3)">Not saved</span>
-      </div>
-      <input type="text" id="profileBrand" placeholder="Brand name"/>
-      <input type="text" id="profileProduct" placeholder="Product / service"/>
-      <input type="text" id="profileAudience" placeholder="Target audience"/>
-      <select id="profileTone">
-        <option value="">Select tone...</option>
-        <option>Professional</option>
-        <option>Conversational</option>
-        <option>Playful</option>
-        <option>Luxury / Premium</option>
-        <option>Urgent / Bold</option>
-        <option>Friendly & Warm</option>
-        <option>Witty</option>
-      </select>
-      <div class="profile-btns">
-        <button class="profile-save-btn" onclick="saveProfile()">Save</button>
-        <button class="profile-load-btn" onclick="loadProfile()">Load</button>
-      </div>
-      <div class="profile-saved" id="profileSaved">✓ Profile saved!</div>
-    </div>
+
 
     <div class="sidebar-label">Recent History</div>
     <div id="historyList"><div class="history-empty">No history yet</div></div>
@@ -313,6 +304,22 @@
     </div>
 
     <div class="form-area">
+      <!-- PROFILE BAR -->
+      <div>
+        <label style="margin-bottom:5px;display:block;">Brand Profile</label>
+        <div class="profile-bar" id="profileBarView">
+          <select class="profile-select" id="profileSelectMain" onchange="switchProfile(this.value)">
+            <option value="">— No profile loaded —</option>
+          </select>
+          <button class="profile-action-btn profile-load-main" onclick="showSaveProfile()">+ Save current</button>
+        </div>
+        <div class="profile-bar" id="profileBarSave" style="display:none">
+          <input class="profile-name-input" id="profileNameInput" placeholder="Profile name (e.g. Speak To Inspire)..." maxlength="40"/>
+          <button class="profile-action-btn profile-save-main" onclick="saveNamedProfile()">Save</button>
+          <button class="profile-action-btn profile-load-main" onclick="cancelSaveProfile()" style="color:var(--text3)">Cancel</button>
+        </div>
+        <div class="profile-saved-msg" id="profileSavedMsg">✓ Profile saved!</div>
+      </div>
       <div class="form-row">
         <div class="form-group">
           <label>Brand / Business name</label>
@@ -537,10 +544,12 @@ async function generate(){
     const data=await res.json();
     const text=data.text||'';
     if(!text) throw new Error('Empty response');
-    usageLeft=Math.max(0,usageLeft-1);
-    localStorage.setItem('ck_usage',usageLeft);
-    updateUsageDisplay();
-    addToHistory();
+    if(!renderResults._fromHistory){
+      usageLeft=Math.max(0,usageLeft-1);
+      localStorage.setItem('ck_usage',usageLeft);
+      updateUsageDisplay();
+      addToHistory();
+    }
     renderResults(text);
   }catch(e){
     document.getElementById('resultsBody').innerHTML='<div class="error-box">Something went wrong — please try again.</div>';
@@ -658,43 +667,97 @@ function copyAll(){
   });
 }
 
-// BRAND PROFILE
-function saveProfile(){
-  const profile={
-    brand:document.getElementById('profileBrand').value,
-    product:document.getElementById('profileProduct').value,
-    audience:document.getElementById('profileAudience').value,
-    tone:document.getElementById('profileTone').value,
-  };
-  localStorage.setItem('ck_profile',JSON.stringify(profile));
-  document.getElementById('profileStatus').textContent='Saved ✓';
-  document.getElementById('profileStatus').style.color='#7ABA50';
-  const saved=document.getElementById('profileSaved');
-  saved.style.display='block';
-  setTimeout(()=>{saved.style.display='none';},2000);
+// BRAND PROFILES
+const FREE_PROFILE_LIMIT = 1;
+
+function getProfiles(){
+  return JSON.parse(localStorage.getItem('ck_profiles')||'[]');
 }
 
-function loadProfile(){
-  const p=JSON.parse(localStorage.getItem('ck_profile')||'{}');
+function saveProfiles(profiles){
+  localStorage.setItem('ck_profiles', JSON.stringify(profiles));
+}
+
+function renderProfileSelect(){
+  const profiles = getProfiles();
+  const sel = document.getElementById('profileSelectMain');
+  const current = sel.value;
+  sel.innerHTML = '<option value="">— No profile loaded —</option>' +
+    profiles.map((p,i) => `<option value="${i}">${p.name}</option>`).join('');
+  if(current) sel.value = current;
+}
+
+function showSaveProfile(){
+  const profiles = getProfiles();
+  if(!isPro() && profiles.length >= FREE_PROFILE_LIMIT){
+    // Show upgrade modal
+    document.getElementById('upgradeModal').style.display='flex';
+    document.querySelector('.modal-title').textContent='Upgrade for more profiles';
+    document.querySelector('.modal-sub').textContent='Free accounts can save 1 brand profile. Upgrade to Pro to save unlimited profiles and switch between them instantly.';
+    return;
+  }
+  document.getElementById('profileBarView').style.display='none';
+  document.getElementById('profileBarSave').style.display='flex';
+  document.getElementById('profileNameInput').focus();
+}
+
+function cancelSaveProfile(){
+  document.getElementById('profileBarView').style.display='flex';
+  document.getElementById('profileBarSave').style.display='none';
+  document.getElementById('profileNameInput').value='';
+}
+
+function saveNamedProfile(){
+  const name = document.getElementById('profileNameInput').value.trim();
+  if(!name) return;
+  const profiles = getProfiles();
+  const profile = {
+    name,
+    brand: document.getElementById('brand').value,
+    product: document.getElementById('product').value,
+    audience: document.getElementById('audience').value,
+    tone: document.getElementById('tone').value,
+    usp: document.getElementById('usp').value,
+  };
+  // Check if name already exists — update it
+  const existing = profiles.findIndex(p => p.name.toLowerCase() === name.toLowerCase());
+  if(existing >= 0){ profiles[existing] = profile; } else { profiles.push(profile); }
+  saveProfiles(profiles);
+  renderProfileSelect();
+  // Select the saved profile
+  const idx = getProfiles().findIndex(p => p.name === name);
+  document.getElementById('profileSelectMain').value = idx;
+  cancelSaveProfile();
+  const msg = document.getElementById('profileSavedMsg');
+  msg.style.display='block';
+  setTimeout(()=>msg.style.display='none', 2000);
+}
+
+function switchProfile(idx){
+  if(idx === '') return;
+  const profiles = getProfiles();
+  const p = profiles[parseInt(idx)];
+  if(!p) return;
   if(p.brand) document.getElementById('brand').value=p.brand;
   if(p.product) document.getElementById('product').value=p.product;
   if(p.audience) document.getElementById('audience').value=p.audience;
   if(p.tone) document.getElementById('tone').value=p.tone;
+  if(p.usp) document.getElementById('usp').value=p.usp;
   updateTonePreview();
-  // Also fill profile fields
-  if(p.brand) document.getElementById('profileBrand').value=p.brand;
-  if(p.product) document.getElementById('profileProduct').value=p.product;
-  if(p.audience) document.getElementById('profileAudience').value=p.audience;
-  if(p.tone) document.getElementById('profileTone').value=p.tone;
 }
 
-// Load profile status on init
+// Init profiles on load
 window.addEventListener('load',()=>{
-  const p=localStorage.getItem('ck_profile');
-  if(p){
-    document.getElementById('profileStatus').textContent='Saved ✓';
-    document.getElementById('profileStatus').style.color='#7ABA50';
-    loadProfile();
+  renderProfileSelect();
+  // Migrate old single profile if exists
+  const old = localStorage.getItem('ck_profile');
+  if(old && getProfiles().length === 0){
+    const p = JSON.parse(old);
+    if(p.brand){
+      saveProfiles([{name: p.brand||'My Brand', brand:p.brand, product:p.product||'', audience:p.audience||'', tone:p.tone||'Professional', usp:''}]);
+      renderProfileSelect();
+      localStorage.removeItem('ck_profile');
+    }
   }
 });
 
@@ -705,7 +768,7 @@ function addToHistory(){
   const audience=document.getElementById('audience').value.trim()||'';
   const tone=document.getElementById('tone').value;
   const usp=document.getElementById('usp').value.trim()||'';
-  const entry={tool:currentTool,toolTitle:TOOLS[currentTool].title,brand,product,audience,tone,usp,time:new Date().toLocaleTimeString()};
+  const entry={tool:currentTool,toolTitle:TOOLS[currentTool].title,brand,product,audience,tone,usp,time:new Date().toLocaleTimeString(),results:[...results]};
   sessionHistory.unshift(entry);
   if(sessionHistory.length>5) sessionHistory.pop();
   renderHistory();
@@ -723,15 +786,29 @@ function renderHistory(){
 
 function restoreHistory(i){
   const h=sessionHistory[i];
+  // Switch tool without triggering selectTool's clearResults
+  currentTool=h.tool;
+  document.querySelectorAll('.tool-item').forEach(t=>t.classList.remove('active'));
   const sidebarItem=document.querySelector('.tool-item[data-tool="'+h.tool+'"]');
-  if(sidebarItem) selectTool(sidebarItem);
+  if(sidebarItem) sidebarItem.classList.add('active');
+  document.getElementById('mainTitle').textContent=h.toolTitle;
+  document.getElementById('mainSub').textContent=TOOLS[h.tool].sub;
+  // Restore form fields
   if(h.brand) document.getElementById('brand').value=h.brand;
   if(h.product) document.getElementById('product').value=h.product;
   if(h.audience) document.getElementById('audience').value=h.audience;
   if(h.tone) document.getElementById('tone').value=h.tone;
   if(h.usp) document.getElementById('usp').value=h.usp;
   updateTonePreview();
-  generate();
+  // Restore cached results without using a generation
+  if(h.results&&h.results.length){
+    results=[...h.results];
+    renderResults._fromHistory=true;
+    renderResults(h.results.join('
+---VARIANT---
+'));
+    renderResults._fromHistory=false;
+  }
 }
 
 // USP GENERATOR

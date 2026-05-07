@@ -508,16 +508,18 @@ function getPrompt(){
   const tone=document.getElementById('tone').value;
   const usp=document.getElementById('usp').value.trim()||'';
   const n=TOOLS[currentTool].count;
+  const sep='---VARIANT---';
+  const inst=`\n\nCRITICAL FORMATTING RULES:\n- Output ONLY the ${n} variants, nothing else\n- NO titles, NO headings, NO introductions\n- Separate each variant with exactly this on its own line: ${sep}\n- NO markdown formatting, NO asterisks, NO bold, NO bullet points\n- Just plain text variants separated by ${sep}`;
   const map={
-    ad:`Write ${n} distinct ad copy variants (Facebook/Instagram/Google style) for:\nBrand: ${brand}\nProduct: ${product}\nAudience: ${audience}\nTone: ${tone}\nUSP: ${usp}\n\nEach must have a punchy hook, a clear benefit, and a CTA. Max 60 words each. Number them 1-${n}.`,
-    email:`Write ${n} email subject lines for:\nBrand: ${brand}\nProduct: ${product}\nAudience: ${audience}\nTone: ${tone}\nUSP: ${usp}\n\nMix curiosity, urgency, personalisation, and value angles. Number them 1-${n}.`,
-    product:`Write ${n} product description variants for:\nBrand: ${brand}\nProduct: ${product}\nAudience: ${audience}\nTone: ${tone}\nUSP: ${usp}\n\nEach 50-80 words, sensory and benefit-focused. Number them 1-${n}.`,
-    social:`Write ${n} social media captions (Instagram, LinkedIn, X) for:\nBrand: ${brand}\nProduct: ${product}\nAudience: ${audience}\nTone: ${tone}\nUSP: ${usp}\n\nInclude relevant hashtags. Number them 1-${n}.`,
-    tagline:`Write ${n} brand taglines/slogans for:\nBrand: ${brand}\nProduct: ${product}\nAudience: ${audience}\nTone: ${tone}\nUSP: ${usp}\n\nShort, memorable, brand-defining. Number them 1-${n}.`,
-    cold:`Write ${n} cold outreach email opening lines for:\nBrand: ${brand}\nProduct: ${product}\nAudience: ${audience}\nTone: ${tone}\nUSP: ${usp}\n\n1-2 sentences each. Hook immediately. Number them 1-${n}.`,
-    video:`Write ${n} short-form video scripts (max 60 seconds when spoken aloud) for:\nBrand: ${brand}\nProduct: ${product}\nAudience: ${audience}\nTone: ${tone}\nUSP: ${usp}\n\nInclude a hook, main content, and CTA. Format as [HOOK], [CONTENT], [CTA]. Number them 1-${n}.`,
-    bio:`Write ${n} bio/about page variants for:\nBrand: ${brand}\nProduct: ${product}\nAudience: ${audience}\nTone: ${tone}\nUSP: ${usp}\n\nEach 50-80 words, first person, compelling. Number them 1-${n}.`,
-    cta:`Write ${n} call-to-action button texts for:\nBrand: ${brand}\nProduct: ${product}\nAudience: ${audience}\nTone: ${tone}\nUSP: ${usp}\n\nShort (2-5 words each), action-oriented, conversion-focused. Number them 1-${n}.`,
+    ad:`Write ${n} distinct ad copy variants for Facebook/Instagram/Google.\nBrand: ${brand}\nProduct: ${product}\nAudience: ${audience}\nTone: ${tone}\nUSP: ${usp}\nEach variant: punchy hook + benefit + CTA. Max 60 words each.${inst}`,
+    email:`Write ${n} email subject lines.\nBrand: ${brand}\nProduct: ${product}\nAudience: ${audience}\nTone: ${tone}\nUSP: ${usp}\nMix curiosity, urgency, personalisation, and value angles.${inst}`,
+    product:`Write ${n} product description variants.\nBrand: ${brand}\nProduct: ${product}\nAudience: ${audience}\nTone: ${tone}\nUSP: ${usp}\nEach 50-80 words, sensory and benefit-focused.${inst}`,
+    social:`Write ${n} social media captions for Instagram, LinkedIn, X.\nBrand: ${brand}\nProduct: ${product}\nAudience: ${audience}\nTone: ${tone}\nUSP: ${usp}\nInclude relevant hashtags.${inst}`,
+    tagline:`Write ${n} brand taglines/slogans.\nBrand: ${brand}\nProduct: ${product}\nAudience: ${audience}\nTone: ${tone}\nUSP: ${usp}\nShort, memorable, brand-defining.${inst}`,
+    cold:`Write ${n} cold outreach email opening lines.\nBrand: ${brand}\nProduct: ${product}\nAudience: ${audience}\nTone: ${tone}\nUSP: ${usp}\n1-2 sentences each, hook immediately.${inst}`,
+    video:`Write ${n} short-form video scripts (max 60 seconds spoken).\nBrand: ${brand}\nProduct: ${product}\nAudience: ${audience}\nTone: ${tone}\nUSP: ${usp}\nInclude HOOK, CONTENT, CTA sections.${inst}`,
+    bio:`Write ${n} bio/about page variants.\nBrand: ${brand}\nProduct: ${product}\nAudience: ${audience}\nTone: ${tone}\nUSP: ${usp}\nEach 50-80 words, first person, compelling.${inst}`,
+    cta:`Write ${n} call-to-action button texts.\nBrand: ${brand}\nProduct: ${product}\nAudience: ${audience}\nTone: ${tone}\nUSP: ${usp}\n2-5 words each, action-oriented.${inst}`,
   };
   return map[currentTool];
 }
@@ -565,19 +567,30 @@ async function regenerateOne(idx){
 }
 
 function renderResults(text){
-  const lines=text.split('\n').filter(l=>l.trim());
-  results=[];
-  let cur='';
-  for(const line of lines){
-    if(/^\d+[\.\):\-]/.test(line.trim())){
-      if(cur) results.push(cur.trim());
-      cur=line.replace(/^\d+[\.\):\-]\s*/,'').trim();
-    } else{
-      cur+=(cur?' ':'')+line.trim();
+  // Primary: split by separator
+  const SEP='---VARIANT---';
+  let parts=text.split(SEP).map(s=>s.replace(/\*\*/g,'').replace(/^#+\s*/gm,'').replace(/^\d+[\.\):\-]\s*/,'').trim()).filter(s=>s.length>10);
+
+  // Fallback: numbered list parsing
+  if(parts.length<=1){
+    const lines=text.split('\n').filter(l=>l.trim());
+    parts=[];
+    let cur='';
+    for(const line of lines){
+      const clean=line.replace(/\*\*/g,'').replace(/^#+\s*/,'').trim();
+      if(/^(.*)(variants|usps?|copy options|subject lines|taglines|outreach|scripts|captions|descriptions)(\s*for\s*.*)?$/i.test(clean)&&clean.length<80) continue;
+      if(/^\*{0,2}\d+[\.\):\-]/.test(clean)){
+        if(cur) parts.push(cur.trim());
+        cur=clean.replace(/^\*{0,2}\d+[\.\):\-]\s*/,'').trim();
+      } else if(cur){
+        cur+='\n'+clean;
+      }
     }
+    if(cur) parts.push(cur.trim());
   }
-  if(cur) results.push(cur.trim());
-  if(!results.length) results=[text.trim()];
+
+  results=parts.filter(p=>p.length>0);
+  if(!results.length) results=[text.replace(/\*\*/g,'').trim()];
 
   const t=TOOLS[currentTool];
   const freeLimit=(!isPro() && t.free) ? FREE_VARIANTS : results.length;
@@ -599,7 +612,7 @@ function renderResults(text){
     return`<div class="result-card" data-idx="${i}" style="animation-delay:${i*0.06}s">
       <div class="result-top">
         <span class="result-num">${String(i+1).padStart(2,'0')}</span>
-        <span class="result-text">${r.replace(/\n/g,'<br>')}</span>
+        <span class="result-text" style="white-space:pre-line;">${r}</span>
       </div>
       <div class="result-actions">
         <button class="result-copy" onclick="copyOne(this,${i})">Copy</button>
@@ -688,7 +701,11 @@ window.addEventListener('load',()=>{
 // SESSION HISTORY
 function addToHistory(){
   const brand=document.getElementById('brand').value.trim()||'Unknown';
-  const entry={tool:TOOLS[currentTool].title,brand,time:new Date().toLocaleTimeString()};
+  const product=document.getElementById('product').value.trim()||'';
+  const audience=document.getElementById('audience').value.trim()||'';
+  const tone=document.getElementById('tone').value;
+  const usp=document.getElementById('usp').value.trim()||'';
+  const entry={tool:currentTool,toolTitle:TOOLS[currentTool].title,brand,product,audience,tone,usp,time:new Date().toLocaleTimeString()};
   sessionHistory.unshift(entry);
   if(sessionHistory.length>5) sessionHistory.pop();
   renderHistory();
@@ -699,13 +716,22 @@ function renderHistory(){
   if(!sessionHistory.length){list.innerHTML='<div class="history-empty">No history yet</div>';return;}
   list.innerHTML=sessionHistory.map((h,i)=>`
     <div class="history-item" onclick="restoreHistory(${i})">
-      <div class="history-tool">${h.tool}</div>
+      <div class="history-tool">${h.toolTitle}</div>
       <div class="history-brand">${h.brand} · ${h.time}</div>
     </div>`).join('');
 }
 
 function restoreHistory(i){
-  // Just switch to the right tool — re-generate from stored brand
+  const h=sessionHistory[i];
+  const sidebarItem=document.querySelector('.tool-item[data-tool="'+h.tool+'"]');
+  if(sidebarItem) selectTool(sidebarItem);
+  if(h.brand) document.getElementById('brand').value=h.brand;
+  if(h.product) document.getElementById('product').value=h.product;
+  if(h.audience) document.getElementById('audience').value=h.audience;
+  if(h.tone) document.getElementById('tone').value=h.tone;
+  if(h.usp) document.getElementById('usp').value=h.usp;
+  updateTonePreview();
+  generate();
 }
 
 // USP GENERATOR
@@ -739,10 +765,12 @@ Each USP should be 1-2 sentences, benefit-focused, specific, and compelling. Inc
     const usps = [];
     let cur = '';
     for (const line of lines) {
-      if (/^\d+[\.):]/.test(line.trim())) {
+      const clean = line.replace(/\*\*/g,'').replace(/^#+\s*/,'').trim();
+      if(/^(.*)(usps?|unique selling|statements)(\s*for\s*.*)?$/i.test(clean)&&clean.length<80) continue;
+      if (/^\*{0,2}\d+[\.):]/.test(clean)) {
         if (cur) usps.push(cur.trim());
-        cur = line.replace(/^\d+[\.):\-]\s*/, '').trim();
-      } else { cur += (cur ? ' ' : '') + line.trim(); }
+        cur = clean.replace(/^\*{0,2}\d+[\.):\-]\s*/, '').trim();
+      } else if(cur) { cur += ' ' + clean; }
     }
     if (cur) usps.push(cur.trim());
 

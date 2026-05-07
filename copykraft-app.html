@@ -10,263 +10,202 @@
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap" rel="stylesheet">
 <style>
   :root {
-    --gold: #C8821A;
-    --gold-light: #E8A030;
-    --gold-dim: #8A5610;
-    --gold-glow: rgba(200,130,26,0.12);
-    --bg: #141210;
-    --bg2: #1A1714;
-    --bg3: #FFFFFF;
-    --bg4: #F5F2EE;
-    --text: #F0EDE6;
-    --text2: #A09880;
-    --text3: #6A6050;
-    --border: rgba(200,130,26,0.35);
-    --border2: rgba(200,130,26,0.12);
-    --serif: 'DM Serif Display', Georgia, serif;
-    --sans: 'DM Sans', system-ui, sans-serif;
-    --radius: 10px;
+    --gold:#C8821A;--gold-light:#E8A030;--gold-dim:#8A5610;--gold-glow:rgba(200,130,26,0.12);
+    --bg:#141210;--bg2:#1A1714;--bg3:#FFFFFF;--bg4:#F5F2EE;
+    --text:#F0EDE6;--text2:#A09880;--text3:#6A6050;
+    --border:rgba(200,130,26,0.35);--border2:rgba(200,130,26,0.12);
+    --serif:'DM Serif Display',Georgia,serif;--sans:'DM Sans',system-ui,sans-serif;--radius:10px;
   }
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  html{height:100%}
+  body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:100vh;display:flex;flex-direction:column;line-height:1.6;overflow-x:hidden}
 
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-  html { height: 100%; }
-  body {
-    font-family: var(--sans); background: var(--bg); color: var(--text);
-    min-height: 100vh; display: flex; flex-direction: column;
-    line-height: 1.6; overflow-x: hidden;
-  }
-
-  /* TOP BAR */
-  .topbar {
-    display: flex; align-items: center; justify-content: space-between;
-    padding: 0 28px; height: 58px;
-    border-bottom: 1px solid var(--border2);
-    background: var(--bg2); border-bottom: 1px solid rgba(200,130,26,0.2);
-    position: sticky; top: 0; z-index: 50;
-  }
-  .logo { display: flex; align-items: center; gap: 9px; text-decoration: none; }
-  .logo-mark {
-    width: 28px; height: 28px; background: var(--gold); border-radius: 5px;
-    display: flex; align-items: center; justify-content: center;
-  }
-  .logo-mark svg { width: 14px; height: 14px; fill: #0E0D0B; }
-  .logo-text { font-family: var(--serif); font-size: 17px; color: var(--text); }
-  .logo-text span { color: var(--gold); }
-  .topbar-right { display: flex; align-items: center; gap: 14px; }
-  .usage-pill {
-    font-size: 12px; color: var(--text2); background: var(--bg2);
-    border: 1px solid var(--border2); border-radius: 20px; padding: 4px 12px;
-  }
-  .usage-pill strong { color: var(--gold); }
-  .upgrade-btn {
-    background: var(--gold); color: #0E0D0B; border: none;
-    padding: 7px 16px; border-radius: 6px; font-size: 13px; font-weight: 500;
-    cursor: pointer; text-decoration: none; transition: background 0.2s;
-  }
-  .upgrade-btn:hover { background: var(--gold-light); }
+  /* TOPBAR */
+  .topbar{display:flex;align-items:center;justify-content:space-between;padding:0 28px;height:58px;border-bottom:1px solid var(--border2);background:var(--bg2);position:sticky;top:0;z-index:50}
+  .logo{display:flex;align-items:center;gap:9px;text-decoration:none}
+  .logo-mark{width:28px;height:28px;background:var(--gold);border-radius:5px;display:flex;align-items:center;justify-content:center}
+  .logo-mark svg{width:14px;height:14px;fill:#0E0D0B}
+  .logo-text{font-family:var(--serif);font-size:17px;color:var(--text)}
+  .logo-text span{color:var(--gold)}
+  .topbar-right{display:flex;align-items:center;gap:14px}
+  .usage-pill{font-size:12px;color:var(--text2);background:var(--bg2);border:1px solid var(--border2);border-radius:20px;padding:4px 12px}
+  .usage-pill strong{color:var(--gold)}
+  .upgrade-btn{background:var(--gold);color:#0E0D0B;border:none;padding:7px 16px;border-radius:6px;font-size:13px;font-weight:500;cursor:pointer;text-decoration:none;transition:background 0.2s}
+  .upgrade-btn:hover{background:var(--gold-light)}
 
   /* LAYOUT */
-  .app-body { display: flex; flex: 1; min-height: 0; }
-  .sidebar {
-    width: 220px; flex-shrink: 0; border-right: 1px solid var(--border2);
-    padding: 20px 14px; display: flex; flex-direction: column; gap: 4px;
-    background: var(--bg2);
-  }
-  .sidebar-label {
-    font-size: 10px; color: var(--text2); text-transform: uppercase;
-    letter-spacing: 0.8px; padding: 0 8px; margin-bottom: 4px; margin-top: 8px;
-  }
-  .sidebar-label:first-child { margin-top: 0; }
-  .tool-item {
-    display: flex; align-items: center; gap: 10px; padding: 9px 10px;
-    border-radius: 7px; cursor: pointer; transition: all 0.15s;
-    color: var(--text); font-size: 14px; border: 1px solid transparent;
-  }
-  .tool-item:hover { background: var(--bg3); color: var(--text); }
-  .tool-item.active { background: var(--gold-glow); border-color: var(--border); color: var(--text); }
-  .tool-icon { font-size: 15px; width: 20px; text-align: center; }
-  .tool-count {
-    margin-left: auto; font-size: 10px; background: var(--bg4);
-    border-radius: 3px; padding: 1px 5px; color: var(--text3);
-  }
-  .tool-item.active .tool-count { background: rgba(200,130,26,0.15); color: var(--gold); }
+  .app-body{display:flex;flex:1;min-height:0}
+  .sidebar{width:230px;flex-shrink:0;border-right:1px solid var(--border2);padding:16px 12px;display:flex;flex-direction:column;gap:2px;background:var(--bg2);overflow-y:auto}
+  .sidebar-label{font-size:10px;color:var(--text2);text-transform:uppercase;letter-spacing:0.8px;padding:0 8px;margin-bottom:4px;margin-top:12px}
+  .sidebar-label:first-child{margin-top:0}
+  .tool-item{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:7px;cursor:pointer;transition:all 0.15s;color:var(--text);font-size:13px;border:1px solid transparent}
+  .tool-item:hover{background:rgba(255,255,255,0.05)}
+  .tool-item.active{background:var(--gold-glow);border-color:var(--border);color:var(--text)}
+  .tool-icon{font-size:14px;width:18px;text-align:center}
+  .tool-count{margin-left:auto;font-size:10px;background:rgba(255,255,255,0.06);border-radius:3px;padding:1px 5px;color:var(--text3)}
+  .tool-item.active .tool-count{background:rgba(200,130,26,0.15);color:var(--gold)}
 
-  /* MAIN CONTENT */
-  .main { flex: 1; display: flex; flex-direction: column; min-width: 0; overflow-y: auto; }
-  .main-header { padding: 28px 32px 0; }
-  .main-title { font-family: var(--serif); font-size: 26px; margin-bottom: 4px; color: var(--text); }
-  .main-sub { font-size: 14px; color: var(--text2); font-weight: 300; }
+  /* BRAND PROFILE */
+  .brand-profile{background:var(--bg);border:1px solid var(--border2);border-radius:8px;padding:10px;margin-top:4px}
+  .brand-profile-title{font-size:11px;color:var(--gold);font-weight:500;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between}
+  .brand-profile input,.brand-profile select{width:100%;background:var(--bg2);border:1px solid var(--border2);color:var(--text);border-radius:6px;padding:6px 8px;font-size:11px;font-family:var(--sans);outline:none;margin-bottom:6px}
+  .brand-profile input::placeholder{color:var(--text3)}
+  .profile-btns{display:flex;gap:6px}
+  .profile-save-btn{flex:1;background:var(--gold);color:#0E0D0B;border:none;border-radius:6px;padding:6px;font-size:11px;font-weight:500;cursor:pointer}
+  .profile-load-btn{flex:1;background:transparent;color:var(--gold);border:1px solid var(--border);border-radius:6px;padding:6px;font-size:11px;cursor:pointer}
+  .profile-saved{font-size:10px;color:#7ABA50;text-align:center;margin-top:4px;display:none}
+
+  /* HISTORY */
+  .history-item{background:var(--bg);border:1px solid var(--border2);border-radius:7px;padding:8px 10px;margin-bottom:6px;cursor:pointer;transition:border-color 0.15s}
+  .history-item:hover{border-color:var(--gold-dim)}
+  .history-tool{font-size:10px;color:var(--gold);font-weight:500;margin-bottom:3px}
+  .history-brand{font-size:11px;color:var(--text2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .history-empty{font-size:12px;color:var(--text3);text-align:center;padding:12px 0}
+
+  /* MAIN */
+  .main{flex:1;display:flex;flex-direction:column;min-width:0;overflow-y:auto}
+  .main-header{padding:24px 28px 0}
+  .main-title{font-family:var(--serif);font-size:24px;margin-bottom:3px;color:var(--text)}
+  .main-sub{font-size:13px;color:var(--text2);font-weight:300}
 
   /* FORM */
-  .form-area { padding: 20px 32px; display: flex; flex-direction: column; gap: 14px; }
-  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
-  .form-group { display: flex; flex-direction: column; gap: 5px; }
-  label { font-size: 11px; color: var(--text3); text-transform: uppercase; letter-spacing: 0.5px; font-weight: 500; }
-  input, select, textarea {
-    background: #FFFFFF; border: 1px solid rgba(200,130,26,0.15);
-    color: #1A1814; border-radius: var(--radius); padding: 10px 13px;
-    font-family: var(--sans); font-size: 14px; outline: none;
-    transition: border-color 0.15s; width: 100%;
-  }
-  input::placeholder, textarea::placeholder { color: var(--text3); }
-  input:focus, select:focus, textarea:focus { border-color: var(--gold-dim); }
-  select option { background: var(--bg3); }
-  textarea { resize: vertical; min-height: 72px; line-height: 1.55; }
+  .form-area{padding:16px 28px;display:flex;flex-direction:column;gap:12px}
+  .form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .form-group{display:flex;flex-direction:column;gap:4px}
+  label{font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:0.5px;font-weight:500}
+  input,select,textarea{background:#FFFFFF;border:1px solid rgba(200,130,26,0.15);color:#1A1814;border-radius:var(--radius);padding:9px 12px;font-family:var(--sans);font-size:14px;outline:none;transition:border-color 0.15s;width:100%}
+  input::placeholder,textarea::placeholder{color:#9A9286}
+  input:focus,select:focus,textarea:focus{border-color:var(--gold-dim)}
+  select option{background:#fff;color:#1A1814}
+  textarea{resize:vertical;min-height:70px;line-height:1.55}
 
-  .generate-btn {
-    background: var(--gold); color: #0E0D0B; border: none;
-    padding: 12px 28px; border-radius: var(--radius); font-size: 15px;
-    font-weight: 500; cursor: pointer; transition: all 0.2s;
-    display: flex; align-items: center; gap: 8px; align-self: flex-start;
-  }
-  .generate-btn:hover { background: var(--gold-light); transform: translateY(-1px); }
-  .generate-btn:disabled { opacity: 0.45; cursor: not-allowed; transform: none; }
-  .btn-spinner { width: 16px; height: 16px; border: 2px solid rgba(0,0,0,0.2); border-top-color: #0E0D0B; border-radius: 50%; animation: spin 0.7s linear infinite; }
-  @keyframes spin { to { transform: rotate(360deg); } }
+  /* TONE PREVIEW */
+  .tone-preview{font-size:11px;color:var(--text3);font-style:italic;margin-top:3px;min-height:16px;transition:opacity 0.2s}
 
-  /* DIVIDER */
-  .divider { height: 1px; background: var(--border2); margin: 4px 32px; }
+  .generate-btn{background:var(--gold);color:#0E0D0B;border:none;padding:11px 24px;border-radius:var(--radius);font-size:14px;font-weight:500;cursor:pointer;transition:all 0.2s;display:flex;align-items:center;gap:8px;align-self:flex-start}
+  .generate-btn:hover{background:var(--gold-light);transform:translateY(-1px)}
+  .generate-btn:disabled{opacity:0.45;cursor:not-allowed;transform:none}
+  .btn-spinner{width:15px;height:15px;border:2px solid rgba(0,0,0,0.2);border-top-color:#0E0D0B;border-radius:50%;animation:spin 0.7s linear infinite}
+  @keyframes spin{to{transform:rotate(360deg)}}
+
+  .divider{height:1px;background:var(--border2);margin:4px 28px}
 
   /* RESULTS */
-  .results-area { padding: 0 32px 32px; flex: 1; }
-  .results-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; padding-top: 20px; }
-  .results-title { font-size: 13px; color: var(--text3); text-transform: uppercase; letter-spacing: 0.5px; }
-  .copy-all-btn {
-    font-size: 12px; padding: 5px 12px; border: 1px solid var(--border2);
-    border-radius: 6px; background: transparent; cursor: pointer; color: var(--text3);
-    transition: all 0.15s;
-  }
-  .copy-all-btn:hover { border-color: var(--gold-dim); color: var(--gold); }
+  .results-area{padding:0 28px 28px;flex:1}
+  .results-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;padding-top:16px}
+  .results-title{font-size:12px;color:var(--text3);text-transform:uppercase;letter-spacing:0.5px}
+  .copy-all-btn{font-size:12px;padding:5px 12px;border:1px solid var(--border2);border-radius:6px;background:transparent;cursor:pointer;color:var(--text3);transition:all 0.15s}
+  .copy-all-btn:hover{border-color:var(--gold-dim);color:var(--gold)}
+  .results-grid{display:flex;flex-direction:column;gap:10px}
+  .result-card{background:#FFFFFF;border:1px solid rgba(200,130,26,0.12);border-radius:var(--radius);padding:14px 16px;animation:fadeIn 0.3s ease both;transition:border-color 0.15s}
+  .result-card:hover{border-color:rgba(200,130,26,0.3)}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+  .result-top{display:flex;gap:12px;align-items:flex-start;margin-bottom:8px}
+  .result-num{font-family:var(--serif);font-size:20px;color:var(--gold);opacity:0.8;min-width:26px;line-height:1;margin-top:2px}
+  .result-text{flex:1;font-size:14px;line-height:1.7;color:#1A1814}
+  .result-actions{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+  .result-copy{padding:4px 10px;border:1px solid rgba(200,130,26,0.2);border-radius:6px;background:transparent;font-size:11px;cursor:pointer;color:#5A5246;transition:all 0.15s}
+  .result-copy:hover{border-color:var(--gold-dim);color:var(--gold)}
+  .result-copy.copied{color:#3B6D11;border-color:#3B6D11}
+  .result-regen{padding:4px 10px;border:1px solid rgba(200,130,26,0.2);border-radius:6px;background:transparent;font-size:11px;cursor:pointer;color:#5A5246;transition:all 0.15s}
+  .result-regen:hover{border-color:var(--gold-dim);color:var(--gold)}
+  .char-count{font-size:11px;color:#9A9286;margin-left:auto}
+  .char-count.warn{color:#C8821A}
+  .char-count.over{color:#D08080}
 
-  .results-grid { display: flex; flex-direction: column; gap: 10px; }
-  .result-card {
-    background: #FFFFFF; border: 1px solid rgba(200,130,26,0.12); border-radius: var(--radius);
-    padding: 16px 18px; display: flex; gap: 14px; align-items: flex-start;
-    transition: border-color 0.15s; animation: fadeIn 0.3s ease both;
-  }
-  .result-card:hover { border-color: var(--border); }
-  @keyframes fadeIn { from { opacity:0; transform: translateY(8px); } to { opacity:1; transform:none; } }
-  .result-num { font-family: var(--serif); font-size: 22px; color: var(--gold); opacity: 0.8; min-width: 28px; line-height: 1; margin-top: 2px; }
-  .result-text { flex: 1; font-size: 14px; line-height: 1.7; color: #1A1814; }
-  .result-copy {
-    padding: 5px 10px; border: 1px solid var(--border2); border-radius: 6px;
-    background: transparent; font-size: 11px; cursor: pointer; color: var(--text3);
-    flex-shrink: 0; transition: all 0.15s; white-space: nowrap;
-  }
-  .result-copy:hover { border-color: var(--gold-dim); color: var(--gold); }
-  .result-copy.copied { color: #5A9E3A; border-color: #3A6A20; }
-
-  /* EMPTY STATE */
-  .empty-state { text-align: center; padding: 60px 20px; color: var(--text3); }
-  .empty-icon { font-size: 32px; margin-bottom: 12px; opacity: 0.3; }
-  .empty-text { font-size: 14px; font-weight: 300; }
-
-  /* LOADING */
-  .loading-state { display: flex; gap: 6px; justify-content: center; padding: 48px; }
-  .ldot { width: 8px; height: 8px; border-radius: 50%; background: var(--gold); opacity: 0.3; animation: ldot 1.2s ease-in-out infinite; }
-  .ldot:nth-child(2) { animation-delay: 0.2s; }
-  .ldot:nth-child(3) { animation-delay: 0.4s; }
-  @keyframes ldot { 0%,100%{opacity:0.3;transform:scale(0.8)} 50%{opacity:1;transform:scale(1.1)} }
+  /* EMPTY & LOADING */
+  .empty-state{text-align:center;padding:48px 20px;color:var(--text3)}
+  .empty-icon{font-size:28px;margin-bottom:10px;opacity:0.3}
+  .empty-text{font-size:14px;font-weight:300}
+  .loading-state{display:flex;gap:6px;justify-content:center;padding:40px}
+  .ldot{width:7px;height:7px;border-radius:50%;background:var(--gold);opacity:0.3;animation:ldot 1.2s ease-in-out infinite}
+  .ldot:nth-child(2){animation-delay:0.2s}
+  .ldot:nth-child(3){animation-delay:0.4s}
+  @keyframes ldot{0%,100%{opacity:0.3;transform:scale(0.8)}50%{opacity:1;transform:scale(1.1)}}
+  .error-box{background:rgba(160,40,40,0.08);border:1px solid rgba(160,40,40,0.2);border-radius:var(--radius);padding:12px 16px;font-size:13px;color:#D08080}
 
   /* UPGRADE MODAL */
-  .modal-overlay {
-    position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 200;
-    display: flex; align-items: center; justify-content: center; padding: 20px;
-    backdrop-filter: blur(4px); animation: fadeIn 0.2s ease;
-  }
-  .modal {
-    background: #FFFFFF; border: 1px solid rgba(200,130,26,0.25);
-    border-radius: 16px; padding: 36px; max-width: 460px; width: 100%;
-    text-align: center; box-shadow: 0 8px 40px rgba(0,0,0,0.4);
-  }
-  .modal-icon { font-size: 36px; margin-bottom: 16px; }
-  .modal-title { font-family: var(--serif); font-size: 28px; margin-bottom: 8px; }
-  .modal-sub { font-size: 15px; color: var(--text2); font-weight: 300; margin-bottom: 28px; line-height: 1.6; }
-  .modal-plans { display: flex; gap: 12px; margin-bottom: 20px; }
-  .modal-plan {
-    flex: 1; background: #F8F6F3; border: 1px solid rgba(200,130,26,0.15);
-    border-radius: 10px; padding: 20px 16px; text-align: center;
-    text-decoration: none; transition: all 0.2s; display: block;
-  }
-  .modal-plan:hover { border-color: var(--gold-dim); transform: translateY(-2px); }
-  .modal-plan.featured { border-color: var(--gold); background: var(--gold-glow); }
-  .modal-plan-name { font-size: 12px; color: var(--text3); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
-  .modal-plan-price { font-family: var(--serif); font-size: 32px; color: var(--text); margin-bottom: 4px; }
-  .modal-plan-price span { font-family: var(--sans); font-size: 14px; color: var(--text3); }
-  .modal-plan-cta {
-    display: block; margin-top: 14px; padding: 9px; border-radius: 7px;
-    font-size: 13px; font-weight: 500; text-decoration: none;
-    background: var(--gold); color: #0E0D0B; transition: background 0.2s;
-  }
-  .modal-plan.featured .modal-plan-cta { background: var(--gold); }
-  .modal-plan-cta:hover { background: var(--gold-light); }
-  .modal-plan-ghost .modal-plan-cta { background: var(--bg3); color: var(--text); border: 1px solid var(--border); }
-  .modal-dismiss { font-size: 13px; color: var(--text3); cursor: pointer; background: none; border: none; text-decoration: underline; }
-  .modal-dismiss:hover { color: var(--text2); }
-
-  /* ERROR */
-  .error-box { background: rgba(160,40,40,0.12); border: 1px solid rgba(160,40,40,0.3); border-radius: var(--radius); padding: 14px 16px; font-size: 14px; color: #D08080; }
+  .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:200;display:flex;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(4px);animation:fadeIn 0.2s ease}
+  .modal{background:#FFFFFF;border:1px solid rgba(200,130,26,0.25);border-radius:16px;padding:36px;max-width:460px;width:100%;text-align:center;box-shadow:0 8px 40px rgba(0,0,0,0.4)}
+  .modal-icon{font-size:32px;margin-bottom:14px}
+  .modal-title{font-family:var(--serif);font-size:26px;margin-bottom:8px;color:#1A1814}
+  .modal-sub{font-size:14px;color:#5A5246;font-weight:300;margin-bottom:24px;line-height:1.6}
+  .modal-plans{display:flex;gap:12px;margin-bottom:16px}
+  .modal-plan{flex:1;background:#F8F6F3;border:1px solid rgba(200,130,26,0.15);border-radius:10px;padding:18px 14px;text-align:center;text-decoration:none;transition:all 0.2s;display:block}
+  .modal-plan:hover{border-color:var(--gold-dim);transform:translateY(-2px)}
+  .modal-plan.featured{border-color:var(--gold);background:rgba(200,130,26,0.05)}
+  .modal-plan-name{font-size:11px;color:#9A9286;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px}
+  .modal-plan-price{font-family:var(--serif);font-size:30px;color:#1A1814;margin-bottom:4px}
+  .modal-plan-price span{font-family:var(--sans);font-size:13px;color:#9A9286}
+  .modal-plan-cta{display:block;margin-top:12px;padding:8px;border-radius:7px;font-size:12px;font-weight:500;text-decoration:none;background:var(--gold);color:#0E0D0B;transition:background 0.2s}
+  .modal-plan-cta:hover{background:var(--gold-light)}
+  .modal-plan-ghost .modal-plan-cta{background:#F0EDE6;color:#1A1814}
+  .modal-dismiss{font-size:13px;color:#9A9286;cursor:pointer;background:none;border:none;text-decoration:underline}
 
   /* LOGIN GATE */
-  .login-gate {
-    position: fixed; inset: 0; background: rgba(20,18,16,0.97); z-index: 300;
-    display: flex; align-items: center; justify-content: center;
-    padding: 20px; animation: fadeIn 0.3s ease;
-  }
-  .login-box {
-    background: #FFFFFF; border: 1px solid rgba(200,130,26,0.25);
-    border-radius: 16px; padding: 40px 36px; max-width: 420px; width: 100%;
-    text-align: center; box-shadow: 0 8px 40px rgba(0,0,0,0.4);
-  }
-  .login-logo { display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 28px; }
-  .login-logo-mark { width: 34px; height: 34px; background: var(--gold); border-radius: 7px; display: flex; align-items: center; justify-content: center; }
-  .login-logo-mark svg { width: 18px; height: 18px; fill: #0E0D0B; }
-  .login-logo-text { font-family: var(--serif); font-size: 22px; color: #1A1814; }
-  .login-logo-text span { color: var(--gold); }
-  .login-title { font-family: var(--serif); font-size: 26px; margin-bottom: 8px; color: #1A1814; }
-  .login-sub { font-size: 14px; color: #6A6050; font-weight: 300; margin-bottom: 28px; line-height: 1.6; }
-  .login-form { display: flex; flex-direction: column; gap: 12px; text-align: left; }
-  .login-form input {
-    background: #F8F6F3; border: 1px solid #E8E0D8;
-    color: #1A1814; border-radius: 8px; padding: 12px 14px;
-    font-size: 15px; outline: none; transition: border-color 0.15s; width: 100%;
-  }
-  .login-form input:focus { border-color: var(--gold-dim); }
-  .login-submit {
-    background: var(--gold); color: #0E0D0B; border: none;
-    padding: 13px; border-radius: 8px; font-size: 15px; font-weight: 500;
-    cursor: pointer; transition: background 0.2s; width: 100%; margin-top: 4px;
-  }
-  .login-submit:hover { background: var(--gold-light); }
-  .login-submit:disabled { opacity: 0.5; cursor: not-allowed; }
-  .login-toggle { margin-top: 16px; font-size: 13px; color: #6A6050; }
-  .login-toggle a { color: var(--gold); cursor: pointer; text-decoration: underline; }
-  .login-error { font-size: 13px; color: #D08080; background: rgba(160,40,40,0.1); border: 1px solid rgba(160,40,40,0.2); border-radius: 6px; padding: 10px 12px; display: none; }
-  .login-success { font-size: 13px; color: #7ABA50; background: rgba(80,160,40,0.1); border: 1px solid rgba(80,160,40,0.2); border-radius: 6px; padding: 10px 12px; display: none; }
+  .login-gate{position:fixed;inset:0;background:rgba(20,18,16,0.97);z-index:300;display:flex;align-items:center;justify-content:center;padding:20px;animation:fadeIn 0.3s ease}
+  .login-box{background:#FFFFFF;border:1px solid rgba(200,130,26,0.25);border-radius:16px;padding:40px 36px;max-width:420px;width:100%;text-align:center;box-shadow:0 8px 40px rgba(0,0,0,0.4)}
+  .login-logo{display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:24px}
+  .login-logo-mark{width:32px;height:32px;background:var(--gold);border-radius:7px;display:flex;align-items:center;justify-content:center}
+  .login-logo-mark svg{width:16px;height:16px;fill:#0E0D0B}
+  .login-logo-text{font-family:var(--serif);font-size:20px;color:#1A1814}
+  .login-logo-text span{color:var(--gold)}
+  .login-title{font-family:var(--serif);font-size:24px;margin-bottom:6px;color:#1A1814}
+  .login-sub{font-size:13px;color:#6A6050;font-weight:300;margin-bottom:24px;line-height:1.6}
+  .login-form{display:flex;flex-direction:column;gap:10px;text-align:left}
+  .login-form input{background:#F8F6F3;border:1px solid #E8E0D8;color:#1A1814;border-radius:8px;padding:11px 13px;font-size:14px;outline:none;transition:border-color 0.15s;width:100%}
+  .login-form input:focus{border-color:var(--gold-dim)}
+  .login-submit{background:var(--gold);color:#0E0D0B;border:none;padding:12px;border-radius:8px;font-size:15px;font-weight:500;cursor:pointer;transition:background 0.2s;width:100%;margin-top:4px}
+  .login-submit:hover{background:var(--gold-light)}
+  .login-submit:disabled{opacity:0.5;cursor:not-allowed}
+  .login-toggle{margin-top:14px;font-size:13px;color:#6A6050}
+  .login-toggle a{color:var(--gold);cursor:pointer;text-decoration:underline}
+  .login-error{font-size:13px;color:#D08080;background:rgba(160,40,40,0.08);border:1px solid rgba(160,40,40,0.2);border-radius:6px;padding:10px 12px;display:none}
+  .login-success{font-size:13px;color:#7ABA50;background:rgba(80,160,40,0.08);border:1px solid rgba(80,160,40,0.2);border-radius:6px;padding:10px 12px;display:none}
 
-  .mobile-tools { display: none; }
+  /* PRO LOCKS */
+  .pro-badge{background:rgba(200,130,26,0.2);color:var(--gold);font-weight:500}
+  .pro-tool{opacity:0.7}
+  .pro-tool.active{opacity:1}
+  .locked-overlay{position:relative;overflow:hidden}
+  .locked-overlay::after{content:'🔒 Pro';position:absolute;inset:0;background:rgba(20,18,16,0.85);display:flex;align-items:center;justify-content:center;font-size:13px;color:var(--gold);font-weight:500;border-radius:var(--radius)}
+  .variant-locked{background:rgba(200,130,26,0.05);border:1px dashed rgba(200,130,26,0.3);border-radius:var(--radius);padding:14px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+  .variant-locked-text{font-size:13px;color:var(--text3)}
+  .variant-unlock-btn{background:var(--gold);color:#0E0D0B;border:none;padding:6px 14px;border-radius:6px;font-size:12px;font-weight:500;cursor:pointer;white-space:nowrap;flex-shrink:0}
 
-  @media(max-width: 640px) {
-    .sidebar { display: none; }
-    .mobile-tools {
-      display: flex; gap: 8px; overflow-x: auto; padding: 10px 16px;
-      border-bottom: 1px solid var(--border2); background: var(--bg2);
-      scrollbar-width: none; -ms-overflow-style: none; flex-shrink: 0;
-    }
-    .mobile-tools::-webkit-scrollbar { display: none; }
-    .mobile-tool-btn {
-      flex-shrink: 0; padding: 6px 14px; border-radius: 20px;
-      border: 1px solid var(--border2); background: transparent;
-      font-size: 12px; color: var(--text2); cursor: pointer;
-      font-family: var(--sans); white-space: nowrap; transition: all 0.15s;
-    }
-    .mobile-tool-btn.active {
-      background: var(--gold); color: #0E0D0B;
-      border-color: var(--gold); font-weight: 500;
-    }
-    .form-row { grid-template-columns: 1fr; }
-    .form-area, .results-area, .main-header { padding-left: 16px; padding-right: 16px; }
-    .modal-plans { flex-direction: column; }
+  /* USP HELPER */
+  .label-row{display:flex;align-items:center;gap:8px}
+  .tooltip-wrap{position:relative;display:inline-block}
+  .tooltip-btn{width:16px;height:16px;border-radius:50%;background:rgba(200,130,26,0.15);border:none;font-size:10px;color:var(--gold);cursor:pointer;display:flex;align-items:center;justify-content:center;font-weight:700;flex-shrink:0}
+  .tooltip-btn:hover{background:var(--gold);color:#0E0D0B}
+  .tooltip-box{display:none;position:absolute;left:24px;top:-8px;width:260px;background:var(--bg2);color:var(--text);border-radius:8px;padding:12px 14px;font-size:12px;line-height:1.6;z-index:100;border:1px solid var(--border)}
+  .tooltip-box::before{content:'';position:absolute;left:-6px;top:12px;width:0;height:0;border-top:6px solid transparent;border-bottom:6px solid transparent;border-right:6px solid var(--bg2)}
+  .tooltip-wrap:hover .tooltip-box{display:block}
+  .tooltip-title{color:var(--gold);font-weight:500;margin-bottom:6px}
+  .tooltip-tip{margin-bottom:4px;font-size:11px;color:var(--text2)}
+  .tooltip-tip::before{content:'✦ ';color:var(--gold)}
+  .usp-actions{display:flex;align-items:center;gap:8px;margin-top:8px}
+  .gen-usp-btn{display:flex;align-items:center;gap:6px;padding:7px 14px;background:rgba(200,130,26,0.08);border:1px solid rgba(200,130,26,0.25);border-radius:20px;font-size:12px;color:var(--gold);cursor:pointer;font-family:var(--sans);transition:all 0.15s;white-space:nowrap}
+  .gen-usp-btn:hover{background:rgba(200,130,26,0.15)}
+  .usp-hint{font-size:11px;color:var(--text3)}
+  .usp-suggestions{margin-top:10px;display:none}
+  .suggestions-label{font-size:11px;color:var(--text3);margin-bottom:6px}
+  .suggestion-item{background:#FFFFFF;border:1px solid rgba(200,130,26,0.15);border-radius:8px;padding:10px 12px;font-size:13px;color:#1A1814;cursor:pointer;margin-bottom:6px;line-height:1.5;transition:all 0.15s;display:flex;align-items:flex-start;justify-content:space-between;gap:8px}
+  .suggestion-item:hover{border-color:var(--gold);background:rgba(200,130,26,0.04)}
+  .use-btn{font-size:11px;color:var(--gold);white-space:nowrap;flex-shrink:0;margin-top:2px;font-weight:500}
+
+  /* MOBILE */
+  .mobile-tools{display:none}
+  @media(max-width:640px){
+    .sidebar{display:none}
+    .mobile-tools{display:flex;gap:8px;overflow-x:auto;padding:10px 16px;border-bottom:1px solid var(--border2);background:var(--bg2);scrollbar-width:none;flex-shrink:0}
+    .mobile-tools::-webkit-scrollbar{display:none}
+    .mobile-tool-btn{flex-shrink:0;padding:6px 14px;border-radius:20px;border:1px solid var(--border2);background:transparent;font-size:12px;color:var(--text2);cursor:pointer;font-family:var(--sans);white-space:nowrap;transition:all 0.15s}
+    .mobile-tool-btn.active{background:var(--gold);color:#0E0D0B;border-color:var(--gold);font-weight:500}
+    .form-row{grid-template-columns:1fr}
+    .form-area,.results-area,.main-header{padding-left:16px;padding-right:16px}
+    .modal-plans{flex-direction:column}
+    .topbar-right .user-info{display:none}
   }
 </style>
 </head>
@@ -276,9 +215,7 @@
 <div class="login-gate" id="loginGate">
   <div class="login-box">
     <div class="login-logo">
-      <div class="login-logo-mark">
-        <svg viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zm17.71-10.21a1 1 0 0 0 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
-      </div>
+      <div class="login-logo-mark"><svg viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zm17.71-10.21a1 1 0 0 0 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg></div>
       <span class="login-logo-text">Copy<span>Kraft</span> AI</span>
     </div>
     <h2 class="login-title" id="authTitle">Welcome back</h2>
@@ -286,33 +223,29 @@
     <div class="login-form">
       <div class="login-error" id="authError"></div>
       <div class="login-success" id="authSuccess"></div>
-      <input type="email" id="authEmail" placeholder="Email address" autocomplete="email" />
-      <input type="password" id="authPassword" placeholder="Password (min 8 characters)" autocomplete="current-password" />
+      <input type="email" id="authEmail" placeholder="Email address" autocomplete="email"/>
+      <input type="password" id="authPassword" placeholder="Password (min 8 characters)" autocomplete="current-password"/>
       <button class="login-submit" id="authSubmit" onclick="handleAuth()">Sign in</button>
     </div>
-    <div class="login-toggle" id="authToggle">
-      No account yet? <a onclick="toggleAuthMode()">Sign up free</a>
-    </div>
+    <div class="login-toggle" id="authToggle">No account yet? <a onclick="toggleAuthMode()">Sign up free</a></div>
   </div>
 </div>
 
-<!-- TOP BAR -->
+<!-- TOPBAR -->
 <div class="topbar">
   <a href="https://copykraftai.vercel.app" class="logo">
-    <div class="logo-mark">
-      <svg viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zm17.71-10.21a1 1 0 0 0 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
-    </div>
+    <div class="logo-mark"><svg viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zm17.71-10.21a1 1 0 0 0 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg></div>
     <span class="logo-text">Copy<span>Kraft</span> AI</span>
   </a>
   <div class="topbar-right">
-    <div class="usage-pill">Free: <strong id="usageDisplay">20</strong> generations left</div>
-    <span id="userEmail" style="font-size:13px;color:var(--text2);"></span>
-    <button onclick="signOut()" style="font-size:13px;color:var(--text2);background:none;border:none;cursor:pointer;text-decoration:underline;" id="logoutBtn">Sign out</button>
+    <div class="usage-pill">Free: <strong id="usageDisplay">20</strong> left</div>
+    <span class="user-info" id="userEmail" style="font-size:13px;color:var(--text2);"></span>
+    <button onclick="signOut()" class="user-info" style="font-size:13px;color:var(--text2);background:none;border:none;cursor:pointer;text-decoration:underline;">Sign out</button>
     <a href="https://buy.stripe.com/9B6cN7a4zdNQb8eeklfQI00" target="_blank" class="upgrade-btn">Upgrade to Pro →</a>
   </div>
 </div>
 
-<!-- MOBILE TOOL BAR -->
+<!-- MOBILE TOOLS -->
 <div class="mobile-tools" id="mobileTools">
   <button class="mobile-tool-btn active" data-tool="ad" onclick="selectMobileTool(this)">Ad Copy</button>
   <button class="mobile-tool-btn" data-tool="email" onclick="selectMobileTool(this)">Email Subjects</button>
@@ -320,6 +253,9 @@
   <button class="mobile-tool-btn" data-tool="social" onclick="selectMobileTool(this)">Social Posts</button>
   <button class="mobile-tool-btn" data-tool="tagline" onclick="selectMobileTool(this)">Taglines</button>
   <button class="mobile-tool-btn" data-tool="cold" onclick="selectMobileTool(this)">Cold Outreach</button>
+  <button class="mobile-tool-btn" data-tool="video" onclick="selectMobileTool(this)">Video Script</button>
+  <button class="mobile-tool-btn" data-tool="bio" onclick="selectMobileTool(this)">Bio / About</button>
+  <button class="mobile-tool-btn" data-tool="cta" onclick="selectMobileTool(this)">CTA Buttons</button>
 </div>
 
 <!-- APP BODY -->
@@ -328,24 +264,45 @@
   <!-- SIDEBAR -->
   <div class="sidebar">
     <div class="sidebar-label">Copy Tools</div>
-    <div class="tool-item active" data-tool="ad" onclick="selectTool(this)">
-      <span class="tool-icon">✦</span> Ad Copy <span class="tool-count">×4</span>
+    <div class="tool-item active" data-tool="ad" onclick="selectTool(this)"><span class="tool-icon">✦</span> Ad Copy <span class="tool-count">×4</span></div>
+    <div class="tool-item" data-tool="email" onclick="selectTool(this)"><span class="tool-icon">◎</span> Email Subjects <span class="tool-count">×6</span></div>
+    <div class="tool-item" data-tool="social" onclick="selectTool(this)"><span class="tool-icon">◈</span> Social Posts <span class="tool-count">×4</span></div>
+    <div class="sidebar-label">Pro Tools 🔒</div>
+    <div class="tool-item pro-tool" data-tool="product" onclick="selectTool(this)"><span class="tool-icon">▣</span> Product Desc. <span class="tool-count pro-badge">Pro</span></div>
+    <div class="tool-item pro-tool" data-tool="tagline" onclick="selectTool(this)"><span class="tool-icon">❋</span> Taglines <span class="tool-count pro-badge">Pro</span></div>
+    <div class="tool-item pro-tool" data-tool="cold" onclick="selectTool(this)"><span class="tool-icon">→</span> Cold Outreach <span class="tool-count pro-badge">Pro</span></div>
+    <div class="tool-item pro-tool" data-tool="video" onclick="selectTool(this)"><span class="tool-icon">▶</span> Video Script <span class="tool-count pro-badge">Pro</span></div>
+    <div class="tool-item pro-tool" data-tool="bio" onclick="selectTool(this)"><span class="tool-icon">◉</span> Bio / About <span class="tool-count pro-badge">Pro</span></div>
+    <div class="tool-item pro-tool" data-tool="cta" onclick="selectTool(this)"><span class="tool-icon">⚡</span> CTA Buttons <span class="tool-count pro-badge">Pro</span></div>
+
+    <div class="sidebar-label">Brand Profile</div>
+    <div class="brand-profile">
+      <div class="brand-profile-title">
+        <span>Saved Profile</span>
+        <span id="profileStatus" style="font-size:10px;color:var(--text3)">Not saved</span>
+      </div>
+      <input type="text" id="profileBrand" placeholder="Brand name"/>
+      <input type="text" id="profileProduct" placeholder="Product / service"/>
+      <input type="text" id="profileAudience" placeholder="Target audience"/>
+      <select id="profileTone">
+        <option value="">Select tone...</option>
+        <option>Professional</option>
+        <option>Conversational</option>
+        <option>Playful</option>
+        <option>Luxury / Premium</option>
+        <option>Urgent / Bold</option>
+        <option>Friendly & Warm</option>
+        <option>Witty</option>
+      </select>
+      <div class="profile-btns">
+        <button class="profile-save-btn" onclick="saveProfile()">Save</button>
+        <button class="profile-load-btn" onclick="loadProfile()">Load</button>
+      </div>
+      <div class="profile-saved" id="profileSaved">✓ Profile saved!</div>
     </div>
-    <div class="tool-item" data-tool="email" onclick="selectTool(this)">
-      <span class="tool-icon">◎</span> Email Subjects <span class="tool-count">×6</span>
-    </div>
-    <div class="tool-item" data-tool="product" onclick="selectTool(this)">
-      <span class="tool-icon">▣</span> Product Desc. <span class="tool-count">×3</span>
-    </div>
-    <div class="tool-item" data-tool="social" onclick="selectTool(this)">
-      <span class="tool-icon">◈</span> Social Posts <span class="tool-count">×4</span>
-    </div>
-    <div class="tool-item" data-tool="tagline" onclick="selectTool(this)">
-      <span class="tool-icon">❋</span> Taglines <span class="tool-count">×6</span>
-    </div>
-    <div class="tool-item" data-tool="cold" onclick="selectTool(this)">
-      <span class="tool-icon">→</span> Cold Outreach <span class="tool-count">×4</span>
-    </div>
+
+    <div class="sidebar-label">Recent History</div>
+    <div id="historyList"><div class="history-empty">No history yet</div></div>
   </div>
 
   <!-- MAIN -->
@@ -359,21 +316,21 @@
       <div class="form-row">
         <div class="form-group">
           <label>Brand / Business name</label>
-          <input type="text" id="brand" placeholder="e.g. CopyKraft AI" />
+          <input type="text" id="brand" placeholder="e.g. CopyKraft AI"/>
         </div>
         <div class="form-group">
           <label>Product or service</label>
-          <input type="text" id="product" placeholder="e.g. AI copywriting tool" />
+          <input type="text" id="product" placeholder="e.g. AI copywriting tool"/>
         </div>
       </div>
       <div class="form-row">
         <div class="form-group">
           <label>Target audience</label>
-          <input type="text" id="audience" placeholder="e.g. Marketing managers, freelancers" />
+          <input type="text" id="audience" placeholder="e.g. Marketing managers, freelancers"/>
         </div>
         <div class="form-group">
           <label>Tone</label>
-          <select id="tone">
+          <select id="tone" onchange="updateTonePreview()">
             <option>Professional</option>
             <option>Conversational</option>
             <option>Playful</option>
@@ -382,11 +339,32 @@
             <option>Friendly & Warm</option>
             <option>Witty</option>
           </select>
+          <div class="tone-preview" id="tonePreview">e.g. "Our solution delivers measurable results for your business."</div>
         </div>
       </div>
       <div class="form-group">
-        <label>Key benefit / Unique selling point</label>
-        <textarea id="usp" placeholder="e.g. Generates 4–6 copy variants in seconds. Saves 10+ hours per week. No writing experience needed."></textarea>
+        <div class="label-row">
+          <label>Key benefit / Unique selling point</label>
+          <div class="tooltip-wrap">
+            <button class="tooltip-btn">?</button>
+            <div class="tooltip-box">
+              <div class="tooltip-title">What makes a great USP?</div>
+              <div class="tooltip-tip">Focus on the outcome, not the feature — "saves 3 hours" not "has automation"</div>
+              <div class="tooltip-tip">Add a number if you can — specifics convert better</div>
+              <div class="tooltip-tip">Include social proof — "used by 500+ marketers"</div>
+              <div class="tooltip-tip">Mention what makes you different from competitors</div>
+            </div>
+          </div>
+        </div>
+        <textarea id="usp" placeholder="e.g. Generates 4–6 copy variants in seconds. Saves 10+ hours per week."></textarea>
+        <div class="usp-actions">
+          <button class="gen-usp-btn" id="genUspBtn" onclick="generateUSP()">✦ Help me write this</button>
+          <span class="usp-hint">AI suggests USPs based on your brand & product</span>
+        </div>
+        <div class="usp-suggestions" id="uspSuggestions">
+          <div class="suggestions-label">Pick one or combine them:</div>
+          <div id="uspSuggestionsList"></div>
+        </div>
       </div>
       <button class="generate-btn" id="genBtn" onclick="generate()">
         <span id="btnLabel">Generate copy</span>
@@ -420,13 +398,13 @@
       <div class="modal-plan featured">
         <div class="modal-plan-name">Pro</div>
         <div class="modal-plan-price">$29<span>/mo</span></div>
-        <div style="font-size:12px;color:var(--text2);margin-top:4px">Unlimited generations</div>
+        <div style="font-size:12px;color:#9A9286;margin-top:4px">Unlimited generations</div>
         <a href="https://buy.stripe.com/9B6cN7a4zdNQb8eeklfQI00" target="_blank" class="modal-plan-cta">Start Pro →</a>
       </div>
       <div class="modal-plan modal-plan-ghost">
         <div class="modal-plan-name">Agency</div>
         <div class="modal-plan-price">$99<span>/mo</span></div>
-        <div style="font-size:12px;color:var(--text2);margin-top:4px">5 seats + API access</div>
+        <div style="font-size:12px;color:#9A9286;margin-top:4px">5 seats + API access</div>
         <a href="https://buy.stripe.com/00wbJ3a4z258fou4JLfQI01" target="_blank" class="modal-plan-cta">Start Agency →</a>
       </div>
     </div>
@@ -435,254 +413,434 @@
 </div>
 
 <script>
-function selectMobileTool(el) {
-  document.querySelectorAll('.mobile-tool-btn').forEach(function(b) { b.classList.remove('active'); });
-  el.classList.add('active');
-  var tool = el.dataset.tool;
-  var sidebarItem = document.querySelector('.tool-item[data-tool="' + tool + '"]');
-  if (sidebarItem) selectTool(sidebarItem);
-}
+const SUPABASE_URL='https://cwzvnlwbotgwjlxagglp.supabase.co';
+const SUPABASE_ANON='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN3enZubHdib3Rnd2pseGFnZ2xwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc2NTk5MjAsImV4cCI6MjA5MzIzNTkyMH0.mi8_q-pKkbVREgNzjoaF3GPQSOsqV15aIPnOKWiTenA';
+const sbClient=window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON);
 
-// SUPABASE AUTH
-const SUPABASE_URL = 'https://cwzvnlwbotgwjlxagglp.supabase.co';
-const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN3enZubHdib3Rnd2pseGFnZ2xwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc2NTk5MjAsImV4cCI6MjA5MzIzNTkyMH0.mi8_q-pKkbVREgNzjoaF3GPQSOsqV15aIPnOKWiTenA';
-const sbClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
-
-let isSignup = false;
-
-function toggleAuthMode() {
-  isSignup = !isSignup;
-  document.getElementById('authTitle').textContent = isSignup ? 'Create your free account' : 'Welcome back';
-  document.getElementById('authSub').textContent = isSignup ? 'Free forever — 20 generations per month, no credit card needed' : 'Sign in to your free account to start generating copy';
-  document.getElementById('authSubmit').textContent = isSignup ? 'Create account' : 'Sign in';
-  document.getElementById('authToggle').innerHTML = isSignup ? 'Already have an account? <a onclick="toggleAuthMode()">Sign in</a>' : 'No account yet? <a onclick="toggleAuthMode()">Sign up free</a>';
-  document.getElementById('authError').style.display = 'none';
-  document.getElementById('authSuccess').style.display = 'none';
-}
-
-async function handleAuth() {
-  const email = document.getElementById('authEmail').value.trim();
-  const password = document.getElementById('authPassword').value;
-  const errEl = document.getElementById('authError');
-  const sucEl = document.getElementById('authSuccess');
-  const btn = document.getElementById('authSubmit');
-
-  errEl.style.display = 'none';
-  sucEl.style.display = 'none';
-
-  if (!email || !password) { errEl.textContent = 'Please enter your email and password.'; errEl.style.display = 'block'; return; }
-  if (password.length < 8) { errEl.textContent = 'Password must be at least 8 characters.'; errEl.style.display = 'block'; return; }
-
-  btn.disabled = true;
-  btn.textContent = isSignup ? 'Creating account...' : 'Signing in...';
-
-  if (isSignup) {
-    const { error } = await sbClient.auth.signUp({ email, password });
-    if (error) {
-      errEl.textContent = error.message; errEl.style.display = 'block';
-    } else {
-      sucEl.textContent = 'Account created! Check your email to confirm, then sign in.';
-      sucEl.style.display = 'block';
-      addToMailerLite(email);
-      toggleAuthMode();
-    }
-  } else {
-    const { data, error } = await sbClient.auth.signInWithPassword({ email, password });
-    if (error) {
-      errEl.textContent = error.message; errEl.style.display = 'block';
-    } else {
-      showApp(data.user);
-    }
-  }
-
-  btn.disabled = false;
-  btn.textContent = isSignup ? 'Create account' : 'Sign in';
-}
-
-async function addToMailerLite(email) {
-  try {
-    await fetch('/api/subscribe', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email })
-    });
-  } catch(e) {
-    console.log('MailerLite error:', e);
-  }
-}
-
-function showApp(user) {
-  document.getElementById('loginGate').style.display = 'none';
-  const emailEl = document.getElementById('userEmail');
-  if (emailEl) emailEl.textContent = user.email;
-}
-
-async function signOut() {
-  await sbClient.auth.signOut();
-  document.getElementById('loginGate').style.display = 'flex';
-  document.getElementById('userEmail').textContent = '';
-}
-
-// Check session on load
-window.addEventListener('load', async () => {
-  const { data: { session } } = await sbClient.auth.getSession();
-  if (session) {
-    showApp(session.user);
-  } else {
-    document.getElementById('loginGate').style.display = 'flex';
-  }
-});
-
-// Allow Enter key to submit
-document.addEventListener('keydown', e => {
-  if (e.key === 'Enter' && document.getElementById('loginGate').style.display !== 'none') handleAuth();
-});
-
-const FREE_LIMIT = 20;
-const TOOLS = {
-  ad:      { title: 'Ad Copy',             sub: 'Generate 4 high-converting ad variants for Facebook, Instagram & Google', count: 4 },
-  email:   { title: 'Email Subject Lines', sub: 'Generate 6 subject lines engineered for high open rates', count: 6 },
-  product: { title: 'Product Description', sub: 'Generate 3 sensory, benefit-first product descriptions', count: 3 },
-  social:  { title: 'Social Media Posts',  sub: 'Generate 4 platform-native captions with hashtags', count: 4 },
-  tagline: { title: 'Taglines & Slogans',  sub: 'Generate 6 memorable brand taglines', count: 6 },
-  cold:    { title: 'Cold Outreach',        sub: 'Generate 4 cold email openers that actually get replies', count: 4 },
+const FREE_LIMIT=20;
+const TOOLS={
+  ad:     {title:'Ad Copy',           sub:'Generate 4 high-converting ad variants for Facebook, Instagram & Google',count:4, free:true},
+  email:  {title:'Email Subject Lines',sub:'Generate 6 subject lines engineered for high open rates',count:6, free:true},
+  social: {title:'Social Media Posts', sub:'Generate 4 platform-native captions with hashtags',count:4, free:true},
+  product:{title:'Product Description',sub:'Generate 3 sensory, benefit-first product descriptions',count:3, free:false},
+  tagline:{title:'Taglines & Slogans', sub:'Generate 6 memorable brand taglines',count:6, free:false},
+  cold:   {title:'Cold Outreach',      sub:'Generate 4 cold email openers that actually get replies',count:4, free:false},
+  video:  {title:'Video Script',       sub:'Generate 2 short-form video scripts (60 seconds) for YouTube, TikTok or Reels',count:2, free:false},
+  bio:    {title:'Bio / About Page',   sub:'Generate 3 compelling bio or about page variants',count:3, free:false},
+  cta:    {title:'CTA Buttons',        sub:'Generate 6 high-converting call-to-action button texts',count:6, free:false},
 };
 
-let currentTool = 'ad';
-let results = [];
-let usageLeft = parseInt(localStorage.getItem('ck_usage') ?? FREE_LIMIT);
+const isPro = () => localStorage.getItem('ck_pro') === 'true';
+const FREE_VARIANTS = 2;
 
-function updateUsageDisplay() {
-  const el = document.getElementById('usageDisplay');
-  if (el) el.textContent = Math.max(0, usageLeft);
+const TONE_PREVIEWS={
+  'Professional':     'e.g. "Our solution delivers measurable results for your business."',
+  'Conversational':   'e.g. "Honestly? This is the tool we wish we\'d had sooner."',
+  'Playful':          'e.g. "Writing copy used to be painful. Not anymore. 🎉"',
+  'Luxury / Premium': 'e.g. "Crafted for those who demand excellence in every word."',
+  'Urgent / Bold':    'e.g. "Stop wasting time. Start converting. Today."',
+  'Friendly & Warm':  'e.g. "We\'re so glad you\'re here — let\'s make something great together."',
+  'Witty':            'e.g. "Because \'Click here\' is so 2010."',
+};
+
+const CHAR_LIMITS={
+  ad:150, email:60, product:0, social:280, tagline:60, cold:200, video:0, bio:0, cta:30
+};
+
+let currentTool='ad';
+let results=[];
+let usageLeft=parseInt(localStorage.getItem('ck_usage')??FREE_LIMIT);
+let sessionHistory=[];
+
+function updateUsageDisplay(){
+  const el=document.getElementById('usageDisplay');
+  if(el) el.textContent=Math.max(0,usageLeft);
 }
 updateUsageDisplay();
 
-function selectTool(el) {
-  document.querySelectorAll('.tool-item').forEach(t => t.classList.remove('active'));
+function updateTonePreview(){
+  const tone=document.getElementById('tone').value;
+  const el=document.getElementById('tonePreview');
+  if(el) el.textContent=TONE_PREVIEWS[tone]||'';
+}
+updateTonePreview();
+
+function selectTool(el){
+  const tool=el.dataset.tool;
+  if(!isPro() && !TOOLS[tool].free){
+    showProToolModal(TOOLS[tool].title);
+    return;
+  }
+  document.querySelectorAll('.tool-item').forEach(t=>t.classList.remove('active'));
   el.classList.add('active');
-  currentTool = el.dataset.tool;
-  const t = TOOLS[currentTool];
-  document.getElementById('mainTitle').textContent = t.title;
-  document.getElementById('mainSub').textContent = t.sub;
+  currentTool=tool;
+  const t=TOOLS[currentTool];
+  document.getElementById('mainTitle').textContent=t.title;
+  document.getElementById('mainSub').textContent=t.sub;
   clearResults();
 }
 
-function clearResults() {
-  results = [];
-  document.getElementById('copyAllBtn').style.display = 'none';
-  document.getElementById('resultsTitle').textContent = 'Output';
-  document.getElementById('resultsBody').innerHTML = `<div class="empty-state"><div class="empty-icon">✦</div><div class="empty-text">Fill in your details above and click Generate</div></div>`;
+function showProToolModal(toolName){
+  document.getElementById('upgradeModal').style.display='flex';
+  document.querySelector('.modal-title').textContent='Unlock '+toolName;
+  document.querySelector('.modal-sub').textContent='This tool is available on the Pro plan. Upgrade for unlimited access to all 9 copy tools and 4-6 variants per generation.';
 }
 
-function getPrompt() {
-  const brand   = document.getElementById('brand').value.trim()   || 'the brand';
-  const product = document.getElementById('product').value.trim() || 'the product';
-  const audience= document.getElementById('audience').value.trim()|| 'general audience';
-  const tone    = document.getElementById('tone').value;
-  const usp     = document.getElementById('usp').value.trim()     || '';
-  const n       = TOOLS[currentTool].count;
+function selectMobileTool(el){
+  document.querySelectorAll('.mobile-tool-btn').forEach(b=>b.classList.remove('active'));
+  el.classList.add('active');
+  const tool=el.dataset.tool;
+  const sidebarItem=document.querySelector('.tool-item[data-tool="'+tool+'"]');
+  if(sidebarItem) selectTool(sidebarItem);
+}
 
-  const map = {
-    ad:      `Write ${n} distinct ad copy variants (Facebook/Instagram/Google style) for:\nBrand: ${brand}\nProduct: ${product}\nTarget audience: ${audience}\nTone: ${tone}\nUSP: ${usp}\n\nEach variant must have a punchy hook, a clear benefit, and a CTA. Max 60 words each. Number them 1–${n}.`,
-    email:   `Write ${n} email subject lines for:\nBrand: ${brand}\nProduct: ${product}\nAudience: ${audience}\nTone: ${tone}\nUSP: ${usp}\n\nMix curiosity, urgency, personalisation, and value-based angles. Number them 1–${n}.`,
-    product: `Write ${n} product description variants for:\nBrand: ${brand}\nProduct: ${product}\nAudience: ${audience}\nTone: ${tone}\nUSP: ${usp}\n\nEach 50–80 words, sensory and benefit-focused. Number them 1–${n}.`,
-    social:  `Write ${n} social media captions for Instagram, LinkedIn, and X for:\nBrand: ${brand}\nProduct: ${product}\nAudience: ${audience}\nTone: ${tone}\nUSP: ${usp}\n\nInclude relevant hashtags. Number them 1–${n}.`,
-    tagline: `Write ${n} brand taglines/slogans for:\nBrand: ${brand}\nProduct: ${product}\nAudience: ${audience}\nTone: ${tone}\nUSP: ${usp}\n\nShort, memorable, brand-defining. Number them 1–${n}.`,
-    cold:    `Write ${n} cold outreach email opening lines for:\nBrand: ${brand}\nProduct: ${product}\nAudience: ${audience}\nTone: ${tone}\nUSP: ${usp}\n\n1–2 sentences each. Hook immediately, don't be generic. Number them 1–${n}.`,
+function clearResults(){
+  results=[];
+  document.getElementById('copyAllBtn').style.display='none';
+  document.getElementById('resultsTitle').textContent='Output';
+  document.getElementById('resultsBody').innerHTML='<div class="empty-state"><div class="empty-icon">✦</div><div class="empty-text">Fill in your details above and click Generate</div></div>';
+}
+
+function getPrompt(){
+  const brand=document.getElementById('brand').value.trim()||'the brand';
+  const product=document.getElementById('product').value.trim()||'the product';
+  const audience=document.getElementById('audience').value.trim()||'general audience';
+  const tone=document.getElementById('tone').value;
+  const usp=document.getElementById('usp').value.trim()||'';
+  const n=TOOLS[currentTool].count;
+  const map={
+    ad:`Write ${n} distinct ad copy variants (Facebook/Instagram/Google style) for:\nBrand: ${brand}\nProduct: ${product}\nAudience: ${audience}\nTone: ${tone}\nUSP: ${usp}\n\nEach must have a punchy hook, a clear benefit, and a CTA. Max 60 words each. Number them 1-${n}.`,
+    email:`Write ${n} email subject lines for:\nBrand: ${brand}\nProduct: ${product}\nAudience: ${audience}\nTone: ${tone}\nUSP: ${usp}\n\nMix curiosity, urgency, personalisation, and value angles. Number them 1-${n}.`,
+    product:`Write ${n} product description variants for:\nBrand: ${brand}\nProduct: ${product}\nAudience: ${audience}\nTone: ${tone}\nUSP: ${usp}\n\nEach 50-80 words, sensory and benefit-focused. Number them 1-${n}.`,
+    social:`Write ${n} social media captions (Instagram, LinkedIn, X) for:\nBrand: ${brand}\nProduct: ${product}\nAudience: ${audience}\nTone: ${tone}\nUSP: ${usp}\n\nInclude relevant hashtags. Number them 1-${n}.`,
+    tagline:`Write ${n} brand taglines/slogans for:\nBrand: ${brand}\nProduct: ${product}\nAudience: ${audience}\nTone: ${tone}\nUSP: ${usp}\n\nShort, memorable, brand-defining. Number them 1-${n}.`,
+    cold:`Write ${n} cold outreach email opening lines for:\nBrand: ${brand}\nProduct: ${product}\nAudience: ${audience}\nTone: ${tone}\nUSP: ${usp}\n\n1-2 sentences each. Hook immediately. Number them 1-${n}.`,
+    video:`Write ${n} short-form video scripts (max 60 seconds when spoken aloud) for:\nBrand: ${brand}\nProduct: ${product}\nAudience: ${audience}\nTone: ${tone}\nUSP: ${usp}\n\nInclude a hook, main content, and CTA. Format as [HOOK], [CONTENT], [CTA]. Number them 1-${n}.`,
+    bio:`Write ${n} bio/about page variants for:\nBrand: ${brand}\nProduct: ${product}\nAudience: ${audience}\nTone: ${tone}\nUSP: ${usp}\n\nEach 50-80 words, first person, compelling. Number them 1-${n}.`,
+    cta:`Write ${n} call-to-action button texts for:\nBrand: ${brand}\nProduct: ${product}\nAudience: ${audience}\nTone: ${tone}\nUSP: ${usp}\n\nShort (2-5 words each), action-oriented, conversion-focused. Number them 1-${n}.`,
   };
   return map[currentTool];
 }
 
-async function generate() {
-  if (usageLeft <= 0) {
-    document.getElementById('upgradeModal').style.display = 'flex';
-    return;
+async function generate(){
+  if(usageLeft<=0){document.getElementById('upgradeModal').style.display='flex';return;}
+  const btn=document.getElementById('genBtn');
+  const lbl=document.getElementById('btnLabel');
+  btn.disabled=true;
+  lbl.innerHTML='<span class="btn-spinner"></span> Generating...';
+  document.getElementById('copyAllBtn').style.display='none';
+  document.getElementById('resultsBody').innerHTML='<div class="loading-state"><div class="ldot"></div><div class="ldot"></div><div class="ldot"></div></div>';
+  try{
+    const res=await fetch('/api/generate',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({prompt:getPrompt()})});
+    const data=await res.json();
+    const text=data.text||'';
+    if(!text) throw new Error('Empty response');
+    usageLeft=Math.max(0,usageLeft-1);
+    localStorage.setItem('ck_usage',usageLeft);
+    updateUsageDisplay();
+    addToHistory();
+    renderResults(text);
+  }catch(e){
+    document.getElementById('resultsBody').innerHTML='<div class="error-box">Something went wrong — please try again.</div>';
+  }
+  btn.disabled=false;
+  lbl.textContent='Generate copy';
+}
+
+async function regenerateOne(idx){
+  try{
+    const res=await fetch('/api/generate',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({prompt:getPrompt()+'\n\nReturn ONLY variant number '+(idx+1)+'. Just that one variant.'})});
+    const data=await res.json();
+    const text=data.text||'';
+    if(text){
+      results[idx]=text.replace(/^\d+[\.\):\-]\s*/,'').trim();
+      const card=document.querySelector('.result-card[data-idx="'+idx+'"]');
+      if(card){
+        card.querySelector('.result-text').textContent=results[idx];
+        const cc=card.querySelector('.char-count');
+        if(cc) updateCharCount(cc,results[idx]);
+      }
+    }
+  }catch(e){}
+}
+
+function renderResults(text){
+  const lines=text.split('\n').filter(l=>l.trim());
+  results=[];
+  let cur='';
+  for(const line of lines){
+    if(/^\d+[\.\):\-]/.test(line.trim())){
+      if(cur) results.push(cur.trim());
+      cur=line.replace(/^\d+[\.\):\-]\s*/,'').trim();
+    } else{
+      cur+=(cur?' ':'')+line.trim();
+    }
+  }
+  if(cur) results.push(cur.trim());
+  if(!results.length) results=[text.trim()];
+
+  const t=TOOLS[currentTool];
+  const freeLimit=(!isPro() && t.free) ? FREE_VARIANTS : results.length;
+  const shownResults=results.slice(0,freeLimit);
+  const lockedCount=results.length-freeLimit;
+  document.getElementById('resultsTitle').textContent=t.title+' — '+results.length+' variants';
+  document.getElementById('copyAllBtn').style.display='inline-block';
+
+  const limit=CHAR_LIMITS[currentTool];
+
+  const lockedHTML=lockedCount>0?`
+    <div class="variant-locked">
+      <span class="variant-locked-text">🔒 ${lockedCount} more variant${lockedCount>1?'s':''} available on Pro</span>
+      <button class="variant-unlock-btn" onclick="document.getElementById('upgradeModal').style.display='flex'">Upgrade to unlock →</button>
+    </div>`:'';
+
+  document.getElementById('resultsBody').innerHTML='<div class="results-grid">'+shownResults.map((r,i)=>{
+    const charHtml=limit>0?'<span class="char-count" id="cc'+i+'">'+r.length+'/'+limit+'</span>':'';
+    return`<div class="result-card" data-idx="${i}" style="animation-delay:${i*0.06}s">
+      <div class="result-top">
+        <span class="result-num">${String(i+1).padStart(2,'0')}</span>
+        <span class="result-text">${r.replace(/\n/g,'<br>')}</span>
+      </div>
+      <div class="result-actions">
+        <button class="result-copy" onclick="copyOne(this,${i})">Copy</button>
+        <button class="result-regen" onclick="regenerateOne(${i})">↻ Redo</button>
+        ${charHtml}
+      </div>
+    </div>`;
+  }).join('')+lockedHTML+'</div>';
+
+  // Apply char count colors
+  if(limit>0){
+    results.forEach((r,i)=>{
+      const cc=document.getElementById('cc'+i);
+      if(cc) updateCharCount(cc,r);
+    });
   }
 
-  const btn = document.getElementById('genBtn');
-  const lbl = document.getElementById('btnLabel');
+  if(usageLeft<=5&&usageLeft>0){
+    document.getElementById('resultsBody').insertAdjacentHTML('afterbegin','<div style="margin-bottom:12px;padding:10px 14px;background:rgba(200,130,26,0.07);border:1px solid var(--border);border-radius:var(--radius);font-size:13px;color:var(--text2)">⚡ <strong style="color:var(--gold)">'+ usageLeft+' free generation'+(usageLeft===1?'':'s')+' left.</strong> <a href="https://buy.stripe.com/9B6cN7a4zdNQb8eeklfQI00" target="_blank" style="color:var(--gold);text-decoration:underline;margin-left:4px">Upgrade to Pro →</a></div>');
+  }
+}
+
+function updateCharCount(el,text){
+  const limit=CHAR_LIMITS[currentTool];
+  const len=text.length;
+  el.textContent=len+'/'+limit;
+  el.className='char-count'+(len>limit?' over':len>limit*0.85?' warn':'');
+}
+
+function copyOne(btn,idx){
+  navigator.clipboard.writeText(results[idx]).then(()=>{
+    btn.textContent='Copied!';btn.classList.add('copied');
+    setTimeout(()=>{btn.textContent='Copy';btn.classList.remove('copied');},1800);
+  });
+}
+
+function copyAll(){
+  const toCopy=(!isPro()&&TOOLS[currentTool].free)?results.slice(0,FREE_VARIANTS):results;
+  navigator.clipboard.writeText(toCopy.join('\n\n')).then(()=>{
+    const btn=document.getElementById('copyAllBtn');
+    btn.textContent='Copied all!';
+    setTimeout(()=>btn.textContent='Copy all',2000);
+  });
+}
+
+// BRAND PROFILE
+function saveProfile(){
+  const profile={
+    brand:document.getElementById('profileBrand').value,
+    product:document.getElementById('profileProduct').value,
+    audience:document.getElementById('profileAudience').value,
+    tone:document.getElementById('profileTone').value,
+  };
+  localStorage.setItem('ck_profile',JSON.stringify(profile));
+  document.getElementById('profileStatus').textContent='Saved ✓';
+  document.getElementById('profileStatus').style.color='#7ABA50';
+  const saved=document.getElementById('profileSaved');
+  saved.style.display='block';
+  setTimeout(()=>{saved.style.display='none';},2000);
+}
+
+function loadProfile(){
+  const p=JSON.parse(localStorage.getItem('ck_profile')||'{}');
+  if(p.brand) document.getElementById('brand').value=p.brand;
+  if(p.product) document.getElementById('product').value=p.product;
+  if(p.audience) document.getElementById('audience').value=p.audience;
+  if(p.tone) document.getElementById('tone').value=p.tone;
+  updateTonePreview();
+  // Also fill profile fields
+  if(p.brand) document.getElementById('profileBrand').value=p.brand;
+  if(p.product) document.getElementById('profileProduct').value=p.product;
+  if(p.audience) document.getElementById('profileAudience').value=p.audience;
+  if(p.tone) document.getElementById('profileTone').value=p.tone;
+}
+
+// Load profile status on init
+window.addEventListener('load',()=>{
+  const p=localStorage.getItem('ck_profile');
+  if(p){
+    document.getElementById('profileStatus').textContent='Saved ✓';
+    document.getElementById('profileStatus').style.color='#7ABA50';
+    loadProfile();
+  }
+});
+
+// SESSION HISTORY
+function addToHistory(){
+  const brand=document.getElementById('brand').value.trim()||'Unknown';
+  const entry={tool:TOOLS[currentTool].title,brand,time:new Date().toLocaleTimeString()};
+  sessionHistory.unshift(entry);
+  if(sessionHistory.length>5) sessionHistory.pop();
+  renderHistory();
+}
+
+function renderHistory(){
+  const list=document.getElementById('historyList');
+  if(!sessionHistory.length){list.innerHTML='<div class="history-empty">No history yet</div>';return;}
+  list.innerHTML=sessionHistory.map((h,i)=>`
+    <div class="history-item" onclick="restoreHistory(${i})">
+      <div class="history-tool">${h.tool}</div>
+      <div class="history-brand">${h.brand} · ${h.time}</div>
+    </div>`).join('');
+}
+
+function restoreHistory(i){
+  // Just switch to the right tool — re-generate from stored brand
+}
+
+// USP GENERATOR
+async function generateUSP() {
+  const brand = document.getElementById('brand').value.trim() || 'the brand';
+  const product = document.getElementById('product').value.trim() || 'the product';
+  const audience = document.getElementById('audience').value.trim() || 'general audience';
+  const btn = document.getElementById('genUspBtn');
+  const suggestions = document.getElementById('uspSuggestions');
+  const list = document.getElementById('uspSuggestionsList');
+
+  btn.textContent = '✦ Thinking...';
+  btn.style.opacity = '0.6';
   btn.disabled = true;
-  lbl.innerHTML = '<span class="btn-spinner"></span> Generating...';
-  document.getElementById('copyAllBtn').style.display = 'none';
-  document.getElementById('resultsBody').innerHTML = '<div class="loading-state"><div class="ldot"></div><div class="ldot"></div><div class="ldot"></div></div>';
+  suggestions.style.display = 'none';
 
   try {
     const res = await fetch('/api/generate', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ prompt: getPrompt() })
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({prompt: `Generate 3 distinct unique selling point (USP) statements for:
+Brand: ${brand}
+Product: ${product}
+Audience: ${audience}
+
+Each USP should be 1-2 sentences, benefit-focused, specific, and compelling. Include a number or stat where possible. Number them 1-3.`})
     });
     const data = await res.json();
     const text = data.text || '';
-    if (!text) throw new Error('Empty response');
-
-    // Decrement usage
-    usageLeft = Math.max(0, usageLeft - 1);
-    localStorage.setItem('ck_usage', usageLeft);
-    updateUsageDisplay();
-
-    renderResults(text);
-  } catch(e) {
-    document.getElementById('resultsBody').innerHTML = `<div class="error-box">Something went wrong — please try again. If the issue persists, check your connection.</div>`;
-  }
-
-  btn.disabled = false;
-  lbl.textContent = 'Generate copy';
-}
-
-function renderResults(text) {
-  const lines = text.split('\n').filter(l => l.trim());
-  results = [];
-  let cur = '';
-  for (const line of lines) {
-    if (/^\d+[\.\):\-]/.test(line.trim())) {
-      if (cur) results.push(cur.trim());
-      cur = line.replace(/^\d+[\.\):\-]\s*/, '').trim();
-    } else {
-      cur += (cur ? ' ' : '') + line.trim();
+    const lines = text.split('\n').filter(l => l.trim());
+    const usps = [];
+    let cur = '';
+    for (const line of lines) {
+      if (/^\d+[\.):]/.test(line.trim())) {
+        if (cur) usps.push(cur.trim());
+        cur = line.replace(/^\d+[\.):\-]\s*/, '').trim();
+      } else { cur += (cur ? ' ' : '') + line.trim(); }
     }
+    if (cur) usps.push(cur.trim());
+
+    if (usps.length) {
+      list.innerHTML = usps.map(u => `
+        <div class="suggestion-item" onclick="useUSP(this)">
+          <span>${u}</span>
+          <span class="use-btn">Use →</span>
+        </div>`).join('');
+      suggestions.style.display = 'block';
+    }
+  } catch(e) {
+    list.innerHTML = '<div style="font-size:12px;color:var(--text3)">Could not generate suggestions. Please try again.</div>';
+    suggestions.style.display = 'block';
   }
-  if (cur) results.push(cur.trim());
-  if (!results.length) results = [text.trim()];
 
-  const t = TOOLS[currentTool];
-  document.getElementById('resultsTitle').textContent = `${t.title} — ${results.length} variants`;
-  document.getElementById('copyAllBtn').style.display = 'inline-block';
-
-  document.getElementById('resultsBody').innerHTML = `<div class="results-grid">${
-    results.map((r, i) => `
-      <div class="result-card" style="animation-delay:${i * 0.06}s">
-        <span class="result-num">${String(i+1).padStart(2,'0')}</span>
-        <span class="result-text">${r.replace(/\n/g,'<br>')}</span>
-        <button class="result-copy" onclick="copyOne(this,${i})">Copy</button>
-      </div>`).join('')
-  }</div>`;
-
-  // Show upgrade nudge if running low
-  if (usageLeft <= 5 && usageLeft > 0) {
-    document.getElementById('resultsBody').insertAdjacentHTML('afterbegin',
-      `<div style="margin-bottom:12px;padding:10px 14px;background:rgba(200,130,26,0.07);border:1px solid var(--border);border-radius:var(--radius);font-size:13px;color:var(--text2)">
-        ⚡ <strong style="color:var(--gold)">${usageLeft} free generation${usageLeft===1?'':'s'} left.</strong>
-        <a href="https://buy.stripe.com/9B6cN7a4zdNQb8eeklfQI00" target="_blank" style="color:var(--gold);text-decoration:underline;margin-left:4px">Upgrade to Pro for unlimited →</a>
-      </div>`
-    );
-  }
+  btn.textContent = '✦ Help me write this';
+  btn.style.opacity = '1';
+  btn.disabled = false;
 }
 
-function copyOne(btn, idx) {
-  navigator.clipboard.writeText(results[idx]).then(() => {
-    btn.textContent = 'Copied!'; btn.classList.add('copied');
-    setTimeout(() => { btn.textContent = 'Copy'; btn.classList.remove('copied'); }, 1800);
-  });
+function useUSP(el) {
+  const text = el.querySelector('span:first-child').textContent;
+  document.getElementById('usp').value = text;
+  document.getElementById('uspSuggestions').style.display = 'none';
 }
 
-function copyAll() {
-  navigator.clipboard.writeText(results.join('\n\n')).then(() => {
-    const btn = document.getElementById('copyAllBtn');
-    btn.textContent = 'Copied all!';
-    setTimeout(() => btn.textContent = 'Copy all', 2000);
-  });
+// AUTH
+let isSignup=false;
+
+function toggleAuthMode(){
+  isSignup=!isSignup;
+  document.getElementById('authTitle').textContent=isSignup?'Create your free account':'Welcome back';
+  document.getElementById('authSub').textContent=isSignup?'Free forever — 20 generations per month, no credit card needed':'Sign in to your free account to start generating copy';
+  document.getElementById('authSubmit').textContent=isSignup?'Create account':'Sign in';
+  document.getElementById('authToggle').innerHTML=isSignup?'Already have an account? <a onclick="toggleAuthMode()">Sign in</a>':'No account yet? <a onclick="toggleAuthMode()">Sign up free</a>';
+  document.getElementById('authError').style.display='none';
+  document.getElementById('authSuccess').style.display='none';
+}
+
+async function handleAuth(){
+  const email=document.getElementById('authEmail').value.trim();
+  const password=document.getElementById('authPassword').value;
+  const errEl=document.getElementById('authError');
+  const sucEl=document.getElementById('authSuccess');
+  const btn=document.getElementById('authSubmit');
+  errEl.style.display='none';sucEl.style.display='none';
+  if(!email||!password){errEl.textContent='Please enter your email and password.';errEl.style.display='block';return;}
+  if(password.length<8){errEl.textContent='Password must be at least 8 characters.';errEl.style.display='block';return;}
+  btn.disabled=true;
+  btn.textContent=isSignup?'Creating account...':'Signing in...';
+  if(isSignup){
+    const{error}=await sbClient.auth.signUp({email,password});
+    if(error){errEl.textContent=error.message;errEl.style.display='block';}
+    else{sucEl.textContent='Account created! Check your email to confirm, then sign in.';sucEl.style.display='block';addToMailerLite(email);toggleAuthMode();}
+  } else {
+    const{data,error}=await sbClient.auth.signInWithPassword({email,password});
+    if(error){errEl.textContent=error.message;errEl.style.display='block';}
+    else showApp(data.user);
+  }
+  btn.disabled=false;
+  btn.textContent=isSignup?'Create account':'Sign in';
+}
+
+function showApp(user){
+  document.getElementById('loginGate').style.display='none';
+  const emailEl=document.getElementById('userEmail');
+  if(emailEl) emailEl.textContent=user.email;
+}
+
+async function signOut(){
+  await sbClient.auth.signOut();
+  document.getElementById('loginGate').style.display='flex';
+  document.getElementById('userEmail').textContent='';
+}
+
+async function addToMailerLite(email){
+  try{
+    await fetch('/api/subscribe',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email})});
+  }catch(e){}
+}
+
+window.addEventListener('load',async()=>{
+  const{data:{session}}=await sbClient.auth.getSession();
+  if(session){showApp(session.user);}
+  else{document.getElementById('loginGate').style.display='flex';}
+});
+
+document.addEventListener('keydown',e=>{
+  if(e.key==='Enter'&&document.getElementById('loginGate').style.display!=='none') handleAuth();
+});
+
+function selectMobileTool(el){
+  document.querySelectorAll('.mobile-tool-btn').forEach(b=>b.classList.remove('active'));
+  el.classList.add('active');
+  const tool=el.dataset.tool;
+  const sidebarItem=document.querySelector('.tool-item[data-tool="'+tool+'"]');
+  if(sidebarItem) selectTool(sidebarItem);
 }
 </script>
 </body>

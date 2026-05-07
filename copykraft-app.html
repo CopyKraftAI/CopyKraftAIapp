@@ -191,7 +191,7 @@
   .usp-suggestions{margin-top:10px;display:none}
   .suggestions-label{font-size:11px;color:var(--text3);margin-bottom:6px}
   .suggestion-item{background:#FFFFFF;border:1px solid rgba(200,130,26,0.15);border-radius:8px;padding:10px 12px;font-size:13px;color:#1A1814;cursor:pointer;margin-bottom:6px;line-height:1.5;transition:all 0.15s;display:flex;align-items:flex-start;justify-content:space-between;gap:8px}
-  .suggestion-item:hover{border-color:var(--gold);background:rgba(200,130,26,0.04)}
+  .suggestion-item:hover{border-color:var(--gold);background:#FFF8EE;color:#1A1814}
   .use-btn{font-size:11px;color:var(--gold);white-space:nowrap;flex-shrink:0;margin-top:2px;font-weight:500}
 
   /* MOBILE */
@@ -747,11 +747,13 @@ Each USP should be 1-2 sentences, benefit-focused, specific, and compelling. Inc
     if (cur) usps.push(cur.trim());
 
     if (usps.length) {
-      list.innerHTML = usps.map(u => `
-        <div class="suggestion-item" onclick="useUSP(this)">
-          <span>${u}</span>
-          <span class="use-btn">Use →</span>
-        </div>`).join('');
+      list.innerHTML = usps.map(u => {
+        const clean = u.replace(/\*\*/g,'').replace(/\*/g,'').trim();
+        return `<div class="suggestion-item" onclick="useUSP(this)">
+          <span style="color:#1A1814;flex:1;">${clean}</span>
+          <span class="use-btn" style="color:var(--gold);">Use →</span>
+        </div>`;
+      }).join('');
       suggestions.style.display = 'block';
     }
   } catch(e) {

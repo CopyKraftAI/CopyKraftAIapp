@@ -367,6 +367,142 @@
   </div>
 </section>
 
+
+<div class="divider"></div>
+
+<!-- LIVE DEMO -->
+<section class="section" id="demo">
+  <div class="section-label">Try it now</div>
+  <h2 class="section-title">Generate real copy for your business</h2>
+  <p class="section-sub" style="margin-bottom:2rem">No sign up needed. Just enter your details and see CopyKraft AI in action.</p>
+
+  <div style="background:var(--bg3);border:1px solid var(--border2);border-radius:16px;overflow:hidden;max-width:780px;">
+
+    <!-- Demo form -->
+    <div style="padding:28px 28px 0;">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;">
+        <div>
+          <label style="font-size:11px;color:var(--text2);text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:5px;">Brand / Business name</label>
+          <input id="demoInput1" type="text" placeholder="e.g. Acme Coffee Co." style="width:100%;background:var(--bg);border:1px solid var(--border2);color:var(--text);border-radius:8px;padding:10px 13px;font-family:inherit;font-size:14px;outline:none;">
+        </div>
+        <div>
+          <label style="font-size:11px;color:var(--text2);text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:5px;">Product or service</label>
+          <input id="demoInput2" type="text" placeholder="e.g. Specialty coffee subscription" style="width:100%;background:var(--bg);border:1px solid var(--border2);color:var(--text);border-radius:8px;padding:10px 13px;font-family:inherit;font-size:14px;outline:none;">
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:20px;">
+        <div>
+          <label style="font-size:11px;color:var(--text2);text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:5px;">Target audience</label>
+          <input id="demoInput3" type="text" placeholder="e.g. Coffee lovers, work from home" style="width:100%;background:var(--bg);border:1px solid var(--border2);color:var(--text);border-radius:8px;padding:10px 13px;font-family:inherit;font-size:14px;outline:none;">
+        </div>
+        <div>
+          <label style="font-size:11px;color:var(--text2);text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:5px;">Copy type</label>
+          <select id="demoType" style="width:100%;background:var(--bg);border:1px solid var(--border2);color:var(--text);border-radius:8px;padding:10px 13px;font-family:inherit;font-size:14px;outline:none;">
+            <option value="ad">Ad Copy</option>
+            <option value="email">Email Subject Lines</option>
+            <option value="social">Social Media Posts</option>
+          </select>
+        </div>
+      </div>
+      <button onclick="runDemo()" id="demoBtnLanding" style="background:var(--gold);color:#0E0D0B;border:none;padding:12px 28px;border-radius:8px;font-size:15px;font-weight:500;cursor:pointer;margin-bottom:20px;transition:background 0.2s;">
+        Generate free copy →
+      </button>
+    </div>
+
+    <!-- Demo output -->
+    <div id="demoOutput" style="border-top:1px solid var(--border2);padding:20px 28px;min-height:80px;">
+      <div style="text-align:center;color:var(--text3);font-size:14px;padding:20px 0;">Your copy will appear here ✦</div>
+    </div>
+
+    <!-- Demo CTA -->
+    <div style="background:rgba(200,130,26,0.06);border-top:1px solid var(--border2);padding:16px 28px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
+      <span style="font-size:14px;color:var(--text2);">Want more variants & all 9 tools? Sign up free.</span>
+      <a href="https://copykraftai.vercel.app/copykraft-app.html" style="background:var(--gold);color:#0E0D0B;padding:9px 20px;border-radius:8px;font-size:13px;font-weight:500;text-decoration:none;">Start free — no card needed</a>
+    </div>
+  </div>
+</section>
+
+<script>
+async function runDemo() {
+  const brand = document.getElementById('demoInput1').value.trim() || 'my business';
+  const product = document.getElementById('demoInput2').value.trim() || 'my product';
+  const audience = document.getElementById('demoInput3').value.trim() || 'general audience';
+  const type = document.getElementById('demoType').value;
+  const btn = document.getElementById('demoBtnLanding');
+  const output = document.getElementById('demoOutput');
+
+  const prompts = {
+    ad: `Write 2 short ad copy variants (Facebook/Google style) for:
+Brand: ${brand}
+Product: ${product}
+Audience: ${audience}
+Tone: Professional
+
+Each max 50 words with a hook, benefit, and CTA. Number them 1-2.`,
+    email: `Write 2 email subject lines for:
+Brand: ${brand}
+Product: ${product}
+Audience: ${audience}
+
+High open rate, mix curiosity and value. Number them 1-2.`,
+    social: `Write 2 social media captions for:
+Brand: ${brand}
+Product: ${product}
+Audience: ${audience}
+
+Engaging, with hashtags. Number them 1-2.`
+  };
+
+  btn.textContent = 'Generating...';
+  btn.disabled = true;
+  output.innerHTML = '<div style="display:flex;gap:6px;justify-content:center;padding:24px"><div style="width:7px;height:7px;border-radius:50%;background:var(--gold);opacity:0.4;animation:ldot 1.2s ease-in-out infinite"></div><div style="width:7px;height:7px;border-radius:50%;background:var(--gold);opacity:0.4;animation:ldot 1.2s 0.2s ease-in-out infinite"></div><div style="width:7px;height:7px;border-radius:50%;background:var(--gold);opacity:0.4;animation:ldot 1.2s 0.4s ease-in-out infinite"></div></div>';
+
+  try {
+    const res = await fetch('https://copykraftai.vercel.app/api/generate', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({prompt: prompts[type]})
+    });
+    const data = await res.json();
+    const text = data.text || '';
+    const lines = text.split('
+').filter(l => l.trim());
+    const results = [];
+    let cur = '';
+    for (const line of lines) {
+      if (/^\d+[.):]/.test(line.trim())) {
+        if (cur) results.push(cur.trim());
+        cur = line.replace(/^\d+[.):\-]\s*/, '').trim();
+      } else { cur += (cur ? ' ' : '') + line.trim(); }
+    }
+    if (cur) results.push(cur.trim());
+    if (!results.length) results = [text.trim()];
+
+    window._demoResults = results.slice(0,2);
+    output.innerHTML = window._demoResults.map((r, i) => `
+      <div style="background:var(--bg);border:1px solid var(--border2);border-radius:10px;padding:14px 16px;margin-bottom:10px;display:flex;gap:12px;align-items:flex-start;">
+        <span style="font-family:'DM Serif Display',serif;font-size:20px;color:var(--gold);opacity:0.7;min-width:24px;">${String(i+1).padStart(2,'0')}</span>
+        <span style="font-size:14px;line-height:1.7;color:var(--text);flex:1;">${r}</span>
+        <button data-idx="${i}" onclick="demoCopy(this)" style="padding:4px 10px;border:1px solid var(--border2);border-radius:6px;background:transparent;font-size:11px;cursor:pointer;color:var(--text2);flex-shrink:0;">Copy</button>
+      </div>`).join('');
+  } catch(e) {
+    output.innerHTML = '<div style="text-align:center;color:var(--text3);font-size:13px;padding:20px">Something went wrong — please try again.</div>';
+  }
+
+  btn.textContent = 'Generate free copy →';
+  btn.disabled = false;
+}
+
+function demoCopy(btn) {
+  const idx = parseInt(btn.dataset.idx);
+  const text = window._demoResults[idx];
+  navigator.clipboard.writeText(text).then(() => {
+    btn.textContent = 'Copied!';
+    setTimeout(() => btn.textContent = 'Copy', 1800);
+  });
+}
+</script>
+
 <div class="divider"></div>
 
 <!-- TESTIMONIALS -->

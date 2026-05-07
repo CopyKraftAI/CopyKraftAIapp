@@ -811,9 +811,7 @@ function restoreHistory(i){
   if(h.results&&h.results.length){
     results=[...h.results];
     renderResults._fromHistory=true;
-    renderResults(h.results.join('
----VARIANT---
-'));
+    renderResults(h.results.join('\n---VARIANT---\n'));
     renderResults._fromHistory=false;
   }
 }

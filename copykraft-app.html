@@ -456,21 +456,19 @@ const CHAR_LIMITS={
 
 let currentTool='ad';
 let results=[];
-let usageLeft=parseInt(localStorage.getItem('ck_usage')??FREE_LIMIT);
+let usageLeft=parseInt(localStorage.getItem('ck_usage')||FREE_LIMIT);
 let sessionHistory=[];
 
 function updateUsageDisplay(){
   const el=document.getElementById('usageDisplay');
   if(el) el.textContent=Math.max(0,usageLeft);
 }
-updateUsageDisplay();
 
 function updateTonePreview(){
-  const tone=document.getElementById('tone').value;
+  const toneEl=document.getElementById('tone');
   const el=document.getElementById('tonePreview');
-  if(el) el.textContent=TONE_PREVIEWS[tone]||'';
+  if(toneEl&&el) el.textContent=TONE_PREVIEWS[toneEl.value]||'';
 }
-updateTonePreview();
 
 function selectTool(el){
   const tool=el.dataset.tool;
@@ -746,19 +744,28 @@ function switchProfile(idx){
   updateTonePreview();
 }
 
-// Init profiles on load
-window.addEventListener('load',()=>{
-  renderProfileSelect();
-  // Migrate old single profile if exists
-  const old = localStorage.getItem('ck_profile');
-  if(old && getProfiles().length === 0){
-    const p = JSON.parse(old);
-    if(p.brand){
-      saveProfiles([{name: p.brand||'My Brand', brand:p.brand, product:p.product||'', audience:p.audience||'', tone:p.tone||'Professional', usp:''}]);
-      renderProfileSelect();
-      localStorage.removeItem('ck_profile');
-    }
+window.addEventListener('load',async()=>{
+  try{ updateUsageDisplay(); }catch(e){}
+  try{ updateTonePreview(); }catch(e){}
+  try{ renderProfileSelect(); }catch(e){}
+  try{
+    const{data:{session}}=await sbClient.auth.getSession();
+    if(session){showApp(session.user);}
+    else{document.getElementById('loginGate').style.display='flex';}
+  }catch(e){
+    document.getElementById('loginGate').style.display='flex';
   }
+  try{
+    const oldProfile=localStorage.getItem('ck_profile');
+    if(oldProfile&&getProfiles().length===0){
+      const p=JSON.parse(oldProfile);
+      if(p.brand){
+        saveProfiles([{name:p.brand||'My Brand',brand:p.brand,product:p.product||'',audience:p.audience||'',tone:p.tone||'Professional',usp:''}]);
+        renderProfileSelect();
+        localStorage.removeItem('ck_profile');
+      }
+    }
+  }catch(e){}
 });
 
 // SESSION HISTORY
@@ -932,23 +939,9 @@ async function addToMailerLite(email){
   }catch(e){}
 }
 
-window.addEventListener('load',async()=>{
-  const{data:{session}}=await sbClient.auth.getSession();
-  if(session){showApp(session.user);}
-  else{document.getElementById('loginGate').style.display='flex';}
-});
-
 document.addEventListener('keydown',e=>{
   if(e.key==='Enter'&&document.getElementById('loginGate').style.display!=='none') handleAuth();
 });
-
-function selectMobileTool(el){
-  document.querySelectorAll('.mobile-tool-btn').forEach(b=>b.classList.remove('active'));
-  el.classList.add('active');
-  const tool=el.dataset.tool;
-  const sidebarItem=document.querySelector('.tool-item[data-tool="'+tool+'"]');
-  if(sidebarItem) selectTool(sidebarItem);
-}
 </script>
 </body>
 </html>

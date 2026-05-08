@@ -316,7 +316,11 @@
           <select class="profile-select" id="profileSelectMain" onchange="switchProfile(this.value)">
             <option value="">— No profile loaded —</option>
           </select>
-          <button class="profile-action-btn profile-load-main" onclick="showSaveProfile()">+ Save current</button>
+          <button class="profile-action-btn profile-load-main" onclick="showSaveProfile()">+ Save</button>
+        </div>
+        <div id="profileActionBtns" style="display:none;gap:6px;margin-top:4px;">
+          <button onclick="editProfile()" style="font-size:11px;padding:4px 10px;border-radius:6px;border:0.5px solid #D8C8A8;background:#FFFDF8;color:var(--text2);cursor:pointer;font-family:var(--sans);">✎ Rename</button>
+          <button onclick="deleteProfile()" style="font-size:11px;padding:4px 10px;border-radius:6px;border:0.5px solid #F5C0C0;background:#FFF0F0;color:#C04040;cursor:pointer;font-family:var(--sans);">✕ Delete</button>
         </div>
         <div class="profile-bar" id="profileBarSave" style="display:none">
           <input class="profile-name-input" id="profileNameInput" placeholder="Profile name (e.g. Speak To Inspire)..." maxlength="40"/>
@@ -716,6 +720,10 @@ function renderProfileSelect(){
   sel.innerHTML = '<option value="">— No profile loaded —</option>' +
     profiles.map((p,i) => `<option value="${i}">${p.name}</option>`).join('');
   if(current) sel.value = current;
+  // Update action buttons visibility
+  const idx = sel.value;
+  const actBtns = document.getElementById('profileActionBtns');
+  if(actBtns) actBtns.style.display = idx !== '' ? 'flex' : 'none';
 }
 
 function showSaveProfile(){
@@ -765,7 +773,12 @@ function saveNamedProfile(){
 }
 
 function switchProfile(idx){
-  if(idx === '') return;
+  const actBtns = document.getElementById('profileActionBtns');
+  if(idx === ''){
+    if(actBtns) actBtns.style.display='none';
+    return;
+  }
+  if(actBtns) actBtns.style.display='flex';
   const profiles = getProfiles();
   const p = profiles[parseInt(idx)];
   if(!p) return;
@@ -774,7 +787,40 @@ function switchProfile(idx){
   if(p.audience) document.getElementById('audience').value=p.audience;
   if(p.tone) document.getElementById('tone').value=p.tone;
   if(p.usp) document.getElementById('usp').value=p.usp;
+  if(p.cta) document.getElementById('cta').value=p.cta;
   updateTonePreview();
+}
+
+function deleteProfile(){
+  const sel = document.getElementById('profileSelectMain');
+  const idx = parseInt(sel.value);
+  if(isNaN(idx)) return;
+  const profiles = getProfiles();
+  const name = profiles[idx].name;
+  if(!confirm('Delete profile "'+name+'"?')) return;
+  profiles.splice(idx, 1);
+  saveProfiles(profiles);
+  renderProfileSelect();
+  // Clear fields
+  document.getElementById('brand').value='';
+  document.getElementById('product').value='';
+  document.getElementById('audience').value='';
+  document.getElementById('usp').value='';
+  document.getElementById('cta').value='';
+}
+
+function editProfile(){
+  const sel = document.getElementById('profileSelectMain');
+  const idx = parseInt(sel.value);
+  if(isNaN(idx)) return;
+  const profiles = getProfiles();
+  const p = profiles[idx];
+  // Load into save bar with existing name for overwrite
+  document.getElementById('profileBarView').style.display='none';
+  document.getElementById('profileBarSave').style.display='flex';
+  document.getElementById('profileNameInput').value=p.name;
+  document.getElementById('profileNameInput').focus();
+  document.getElementById('profileActionBtns').style.display='none';
 }
 
 window.addEventListener('load',async()=>{

@@ -189,6 +189,10 @@
   .variant-locked-text{font-size:13px;color:var(--text2)}
   .variant-unlock-btn{background:var(--gold);color:#0E0D0B;border:none;padding:6px 14px;border-radius:6px;font-size:12px;font-weight:500;cursor:pointer;white-space:nowrap;flex-shrink:0}
 
+  /* CTA SUGGESTIONS */
+  .cta-pill{padding:4px 12px;border-radius:20px;border:0.5px solid #D8C8A8;background:#FFFDF8;font-size:11px;color:var(--text2);cursor:pointer;transition:all 0.15s;font-family:var(--sans);white-space:nowrap}
+  .cta-pill:hover,.cta-pill.active{background:var(--gold);color:#fff;border-color:var(--gold)}
+
   /* USP HELPER */
   .label-row{display:flex;align-items:center;gap:8px}
   .tooltip-wrap{position:relative;display:inline-block}
@@ -374,6 +378,11 @@
           <div id="uspSuggestionsList"></div>
         </div>
       </div>
+      <div class="form-group">
+        <label>Next step goal</label>
+        <div style="font-size:12px;color:var(--text3);margin-bottom:6px;font-weight:300;">What do you want the customer to do next?</div>
+        <input type="text" id="cta" placeholder="e.g. Buy the product, schedule a consultation, book an appointment, give you a call"/>
+      </div>
       <button class="generate-btn" id="genBtn" onclick="generate()">
         <span id="btnLabel">Generate copy</span>
       </button>
@@ -427,15 +436,24 @@ const sbClient=window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON);
 
 const FREE_LIMIT=20;
 const TOOLS={
-  ad:     {title:'Ad Copy',           sub:'Generate 4 high-converting ad variants for Facebook, Instagram & Google',count:4, free:true},
-  email:  {title:'Email Subject Lines',sub:'Generate 6 subject lines engineered for high open rates',count:6, free:true},
-  social: {title:'Social Media Posts', sub:'Generate 4 platform-native captions with hashtags',count:4, free:true},
-  product:{title:'Product Description',sub:'Generate 3 sensory, benefit-first product descriptions',count:3, free:false},
-  tagline:{title:'Taglines & Slogans', sub:'Generate 6 memorable brand taglines',count:6, free:false},
-  cold:   {title:'Cold Outreach',      sub:'Generate 4 cold email openers that actually get replies',count:4, free:false},
-  video:  {title:'Video Script',       sub:'Generate 2 short-form video scripts (60 seconds) for YouTube, TikTok or Reels',count:2, free:false},
-  bio:    {title:'Bio / About Page',   sub:'Generate 3 compelling bio or about page variants',count:3, free:false},
-  cta:    {title:'CTA Buttons',        sub:'Generate 6 high-converting call-to-action button texts',count:6, free:false},
+  ad:     {title:'Ad Copy',           sub:'Generate 4 high-converting ad variants for Facebook, Instagram & Google',count:4, free:true,
+            ctas:['Shop now','Start free trial','Book a free call','Get 50% off','Learn more','Claim your spot']},
+  email:  {title:'Email Subject Lines',sub:'Generate 6 subject lines engineered for high open rates',count:6, free:true,
+            ctas:['Open to find out','Click to claim','See inside','Reply to this email','Do not miss this','Get the details']},
+  social: {title:'Social Media Posts', sub:'Generate 4 platform-native captions with hashtags',count:4, free:true,
+            ctas:['Link in bio','Comment below','Tag someone','Save this post','DM me to learn more','Share with a friend']},
+  product:{title:'Product Description',sub:'Generate 3 sensory, benefit-first product descriptions',count:3, free:false,
+            ctas:['Add to cart','Shop the collection','Order yours today','Limited stock — get yours','Buy now','Explore the range']},
+  tagline:{title:'Taglines & Slogans', sub:'Generate 6 memorable brand taglines',count:6, free:false,
+            ctas:['Visit our website','Start today','Learn more','Join us','Get started','Try it free']},
+  cold:   {title:'Cold Outreach',      sub:'Generate 4 cold email openers that actually get replies',count:4, free:false,
+            ctas:['Worth a 15-min call?','Open to a quick chat?','Reply for more details','Would this help your team?','Free to connect?','Interested?']},
+  video:  {title:'Video Script',       sub:'Generate 2 short-form video scripts (60 seconds) for YouTube, TikTok or Reels',count:2, free:false,
+            ctas:['Link in bio','Comment below','Subscribe now','Follow for more','Check out the website','DM me']},
+  bio:    {title:'Bio / About Page',   sub:'Generate 3 compelling bio or about page variants',count:3, free:false,
+            ctas:['Book a call','Work with me','Get in touch','See my work','Download my guide','Join my newsletter']},
+  cta:    {title:'CTA Buttons',        sub:'Generate 6 high-converting call-to-action button texts',count:6, free:false,
+            ctas:['Start free','Book now','Get started','Learn more','Shop now','Contact us']},
 };
 
 const isPro = () => localStorage.getItem('ck_pro') === 'true';
@@ -471,6 +489,19 @@ function updateTonePreview(){
   if(toneEl&&el) el.textContent=TONE_PREVIEWS[toneEl.value]||'';
 }
 
+function renderCTASuggestions(tool){
+  const container=document.getElementById('ctaSuggestions');
+  if(!container) return;
+  const ctas=TOOLS[tool].ctas||[];
+  container.innerHTML=ctas.map(c=>`<button class="cta-pill" onclick="selectCTA(this,'${c}')">${c}</button>`).join('');
+}
+
+function selectCTA(btn, value){
+  document.querySelectorAll('.cta-pill').forEach(p=>p.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('cta').value=value;
+}
+
 function selectTool(el){
   const tool=el.dataset.tool;
   if(!isPro() && !TOOLS[tool].free){
@@ -483,6 +514,7 @@ function selectTool(el){
   const t=TOOLS[currentTool];
   document.getElementById('mainTitle').textContent=t.title;
   document.getElementById('mainSub').textContent=t.sub;
+  renderCTASuggestions(tool);
   clearResults();
 }
 
@@ -517,15 +549,15 @@ function getPrompt(){
   const sep='---VARIANT---';
   const inst=`\n\nCRITICAL FORMATTING RULES:\n- Output ONLY the ${n} variants, nothing else\n- NO titles, NO headings, NO introductions\n- Separate each variant with exactly this on its own line: ${sep}\n- NO markdown formatting, NO asterisks, NO bold, NO bullet points\n- Just plain text variants separated by ${sep}`;
   const map={
-    ad:`Write ${n} distinct ad copy variants for Facebook/Instagram/Google.\nBrand: ${brand}\nProduct: ${product}\nAudience: ${audience}\nTone: ${tone}\nUSP: ${usp}\nEach variant: punchy hook + benefit + CTA. Max 60 words each.${inst}`,
+    ad:`Write ${n} distinct ad copy variants for Facebook/Instagram/Google.\nBrand: ${brand}\nProduct: ${product}\nAudience: ${audience}\nTone: ${tone}\nUSP: ${usp}${ctaLine}\nEach variant: punchy hook + benefit + CTA. Max 60 words each.${inst}`,
     email:`Write ${n} email subject lines.\nBrand: ${brand}\nProduct: ${product}\nAudience: ${audience}\nTone: ${tone}\nUSP: ${usp}\nMix curiosity, urgency, personalisation, and value angles.${inst}`,
-    product:`Write ${n} product description variants.\nBrand: ${brand}\nProduct: ${product}\nAudience: ${audience}\nTone: ${tone}\nUSP: ${usp}\nEach 50-80 words, sensory and benefit-focused.${inst}`,
-    social:`Write ${n} social media captions for Instagram, LinkedIn, X.\nBrand: ${brand}\nProduct: ${product}\nAudience: ${audience}\nTone: ${tone}\nUSP: ${usp}\nInclude relevant hashtags.${inst}`,
-    tagline:`Write ${n} brand taglines/slogans.\nBrand: ${brand}\nProduct: ${product}\nAudience: ${audience}\nTone: ${tone}\nUSP: ${usp}\nShort, memorable, brand-defining.${inst}`,
-    cold:`Write ${n} cold outreach email opening lines.\nBrand: ${brand}\nProduct: ${product}\nAudience: ${audience}\nTone: ${tone}\nUSP: ${usp}\n1-2 sentences each, hook immediately.${inst}`,
-    video:`Write ${n} short-form video scripts (max 60 seconds spoken).\nBrand: ${brand}\nProduct: ${product}\nAudience: ${audience}\nTone: ${tone}\nUSP: ${usp}\nInclude HOOK, CONTENT, CTA sections.${inst}`,
-    bio:`Write ${n} bio/about page variants.\nBrand: ${brand}\nProduct: ${product}\nAudience: ${audience}\nTone: ${tone}\nUSP: ${usp}\nEach 50-80 words, first person, compelling.${inst}`,
-    cta:`Write ${n} call-to-action button texts.\nBrand: ${brand}\nProduct: ${product}\nAudience: ${audience}\nTone: ${tone}\nUSP: ${usp}\n2-5 words each, action-oriented.${inst}`,
+    product:`Write ${n} product description variants.\nBrand: ${brand}\nProduct: ${product}\nAudience: ${audience}\nTone: ${tone}\nUSP: ${usp}${ctaLine}\nEach 50-80 words, sensory and benefit-focused.${inst}`,
+    social:`Write ${n} social media captions for Instagram, LinkedIn, X.\nBrand: ${brand}\nProduct: ${product}\nAudience: ${audience}\nTone: ${tone}\nUSP: ${usp}${ctaLine}\nInclude relevant hashtags.${inst}`,
+    tagline:`Write ${n} brand taglines/slogans.\nBrand: ${brand}\nProduct: ${product}\nAudience: ${audience}\nTone: ${tone}\nUSP: ${usp}${ctaLine}\nShort, memorable, brand-defining.${inst}`,
+    cold:`Write ${n} cold outreach email opening lines.\nBrand: ${brand}\nProduct: ${product}\nAudience: ${audience}\nTone: ${tone}\nUSP: ${usp}${ctaLine}\n1-2 sentences each, hook immediately.${inst}`,
+    video:`Write ${n} short-form video scripts (max 60 seconds spoken).\nBrand: ${brand}\nProduct: ${product}\nAudience: ${audience}\nTone: ${tone}\nUSP: ${usp}${ctaLine}\nInclude HOOK, CONTENT, CTA sections.${inst}`,
+    bio:`Write ${n} bio/about page variants.\nBrand: ${brand}\nProduct: ${product}\nAudience: ${audience}\nTone: ${tone}\nUSP: ${usp}${ctaLine}\nEach 50-80 words, first person, compelling.${inst}`,
+    cta:`Write ${n} call-to-action button texts.\nBrand: ${brand}\nProduct: ${product}\nAudience: ${audience}\nTone: ${tone}\nUSP: ${usp}${ctaLine}\n2-5 words each, action-oriented.${inst}`,
   };
   return map[currentTool];
 }
@@ -749,6 +781,7 @@ window.addEventListener('load',async()=>{
   try{ updateUsageDisplay(); }catch(e){}
   try{ updateTonePreview(); }catch(e){}
   try{ renderProfileSelect(); }catch(e){}
+  try{ renderCTASuggestions('ad'); }catch(e){}
   try{
     const{data:{session}}=await sbClient.auth.getSession();
     if(session){showApp(session.user);}

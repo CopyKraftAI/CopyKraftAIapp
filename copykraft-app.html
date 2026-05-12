@@ -549,6 +549,9 @@ function getPrompt(){
   const audience=document.getElementById('audience').value.trim()||'general audience';
   const tone=document.getElementById('tone').value;
   const usp=document.getElementById('usp').value.trim()||'';
+  const ctaEl=document.getElementById('cta');
+  const cta=ctaEl?ctaEl.value.trim():'';
+  const ctaLine=cta?`\nNext step goal: ${cta}`:'';
   const n=TOOLS[currentTool].count;
   const sep='---VARIANT---';
   const inst=`\n\nCRITICAL FORMATTING RULES:\n- Output ONLY the ${n} variants, nothing else\n- NO titles, NO headings, NO introductions\n- Separate each variant with exactly this on its own line: ${sep}\n- NO markdown formatting, NO asterisks, NO bold, NO bullet points\n- Just plain text variants separated by ${sep}`;

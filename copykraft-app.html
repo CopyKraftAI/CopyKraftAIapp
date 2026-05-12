@@ -267,15 +267,16 @@
 
 <!-- MOBILE TOOLS -->
 <div class="mobile-tools" id="mobileTools">
-  <button class="mobile-tool-btn active" data-tool="ad" onclick="selectMobileTool(this)">Ad Copy</button>
-  <button class="mobile-tool-btn" data-tool="email" onclick="selectMobileTool(this)">Email Subjects</button>
-  <button class="mobile-tool-btn" data-tool="product" onclick="selectMobileTool(this)">Product Desc.</button>
+  <button class="mobile-tool-btn active" data-tool="email" onclick="selectMobileTool(this)">Email Subjects</button>
   <button class="mobile-tool-btn" data-tool="social" onclick="selectMobileTool(this)">Social Posts</button>
+  <button class="mobile-tool-btn" data-tool="cta" onclick="selectMobileTool(this)">CTA Buttons</button>
+  <button class="mobile-tool-btn" data-tool="ad" onclick="selectMobileTool(this)">Ad Copy</button>
+  <button class="mobile-tool-btn" data-tool="product" onclick="selectMobileTool(this)">Product Desc.</button>
   <button class="mobile-tool-btn" data-tool="tagline" onclick="selectMobileTool(this)">Taglines</button>
   <button class="mobile-tool-btn" data-tool="cold" onclick="selectMobileTool(this)">Cold Outreach</button>
   <button class="mobile-tool-btn" data-tool="video" onclick="selectMobileTool(this)">Video Script</button>
   <button class="mobile-tool-btn" data-tool="bio" onclick="selectMobileTool(this)">Bio / About</button>
-  <button class="mobile-tool-btn" data-tool="cta" onclick="selectMobileTool(this)">CTA Buttons</button>
+  <button class="mobile-tool-btn" data-tool="sequence" onclick="selectMobileTool(this)">Email Sequence</button>
 </div>
 
 <!-- APP BODY -->
@@ -284,16 +285,17 @@
   <!-- SIDEBAR -->
   <div class="sidebar">
     <div class="sidebar-label">Copy Tools</div>
-    <div class="tool-item active" data-tool="ad" onclick="selectTool(this)"><span class="tool-icon">✦</span> Ad Copy <span class="tool-count">×4</span></div>
-    <div class="tool-item" data-tool="email" onclick="selectTool(this)"><span class="tool-icon">◎</span> Email Subjects <span class="tool-count">×6</span></div>
+    <div class="tool-item active" data-tool="email" onclick="selectTool(this)"><span class="tool-icon">◎</span> Email Subjects <span class="tool-count">×6</span></div>
     <div class="tool-item" data-tool="social" onclick="selectTool(this)"><span class="tool-icon">◈</span> Social Posts <span class="tool-count">×4</span></div>
+    <div class="tool-item" data-tool="cta" onclick="selectTool(this)"><span class="tool-icon">⚡</span> CTA Buttons <span class="tool-count">×6</span></div>
     <div class="sidebar-label">Pro Tools 🔒</div>
+    <div class="tool-item pro-tool" data-tool="ad" onclick="selectTool(this)"><span class="tool-icon">✦</span> Ad Copy <span class="tool-count pro-badge">Pro</span></div>
     <div class="tool-item pro-tool" data-tool="product" onclick="selectTool(this)"><span class="tool-icon">▣</span> Product Desc. <span class="tool-count pro-badge">Pro</span></div>
     <div class="tool-item pro-tool" data-tool="tagline" onclick="selectTool(this)"><span class="tool-icon">❋</span> Taglines <span class="tool-count pro-badge">Pro</span></div>
     <div class="tool-item pro-tool" data-tool="cold" onclick="selectTool(this)"><span class="tool-icon">→</span> Cold Outreach <span class="tool-count pro-badge">Pro</span></div>
     <div class="tool-item pro-tool" data-tool="video" onclick="selectTool(this)"><span class="tool-icon">▶</span> Video Script <span class="tool-count pro-badge">Pro</span></div>
     <div class="tool-item pro-tool" data-tool="bio" onclick="selectTool(this)"><span class="tool-icon">◉</span> Bio / About <span class="tool-count pro-badge">Pro</span></div>
-    <div class="tool-item pro-tool" data-tool="cta" onclick="selectTool(this)"><span class="tool-icon">⚡</span> CTA Buttons <span class="tool-count pro-badge">Pro</span></div>
+    <div class="tool-item pro-tool" data-tool="sequence" onclick="selectTool(this)"><span class="tool-icon">✉</span> Email Sequence <span class="tool-count pro-badge">Pro</span></div>
 
 
 
@@ -387,6 +389,171 @@
         <div style="font-size:12px;color:var(--text3);margin-bottom:6px;font-weight:300;">What do you want the customer to do next?</div>
         <input type="text" id="cta" placeholder="e.g. Buy the product, schedule a consultation, book an appointment, give you a call"/>
       </div>
+      <!-- PLATFORM OPTIONS - social posts -->
+      <div id="platformOptions" style="display:none;">
+        <div class="form-group">
+          <label>Platform</label>
+          <select id="socialPlatform">
+            <option value="Instagram">Instagram</option>
+            <option value="TikTok">TikTok</option>
+            <option value="Facebook">Facebook</option>
+            <option value="LinkedIn">LinkedIn</option>
+            <option value="Twitter / X">Twitter / X</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- AD PLATFORM OPTIONS -->
+      <div id="adOptions" style="display:none;">
+        <div class="form-group">
+          <label>Ad platform</label>
+          <select id="adPlatform">
+            <option value="Facebook & Instagram">Facebook & Instagram</option>
+            <option value="Google Search">Google Search</option>
+            <option value="Google Display">Google Display</option>
+            <option value="LinkedIn Ads">LinkedIn Ads</option>
+            <option value="TikTok Ads">TikTok Ads</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- EMAIL SUBJECT OPTIONS -->
+      <div id="emailOptions" style="display:none;">
+        <div class="form-group">
+          <label>Email goal</label>
+          <select id="emailGoal">
+            <option value="Promotional">Promotional — sell or offer something</option>
+            <option value="Newsletter">Newsletter — share value and updates</option>
+            <option value="Welcome">Welcome — onboard a new subscriber</option>
+            <option value="Re-engagement">Re-engagement — win back cold subscribers</option>
+            <option value="Abandoned cart">Abandoned cart — recover lost sales</option>
+            <option value="Cold outreach">Cold outreach — first contact with a prospect</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- CTA OPTIONS -->
+      <div id="ctaOptions" style="display:none;">
+        <div class="form-group">
+          <label>CTA placement</label>
+          <select id="ctaPlacement">
+            <option value="website hero section">Website hero button</option>
+            <option value="end of blog post">End of blog post</option>
+            <option value="popup or modal">Popup / modal</option>
+            <option value="email">Email button</option>
+            <option value="social media bio">Social media bio</option>
+            <option value="checkout page">Checkout page</option>
+            <option value="pricing page">Pricing page</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- PRODUCT DESCRIPTION OPTIONS -->
+      <div id="productOptions" style="display:none;">
+        <div class="form-group">
+          <label>Platform</label>
+          <select id="productPlatform">
+            <option value="website product page">Website product page</option>
+            <option value="Amazon listing">Amazon listing</option>
+            <option value="Etsy listing">Etsy listing</option>
+            <option value="Instagram Shop">Instagram Shop</option>
+            <option value="email campaign">Email campaign</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- TAGLINE OPTIONS -->
+      <div id="taglineOptions" style="display:none;">
+        <div class="form-group">
+          <label>Use case</label>
+          <select id="taglineUse">
+            <option value="website hero headline">Website hero headline</option>
+            <option value="logo and brand mark">Logo / brand mark</option>
+            <option value="social media bio">Social media bio</option>
+            <option value="business card">Business card</option>
+            <option value="ad headline">Ad headline</option>
+            <option value="pitch deck">Pitch deck</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- COLD OUTREACH OPTIONS -->
+      <div id="coldOptions" style="display:none;">
+        <div class="form-group">
+          <label>Outreach channel</label>
+          <select id="coldChannel">
+            <option value="email">Email</option>
+            <option value="LinkedIn DM">LinkedIn DM</option>
+            <option value="Instagram DM">Instagram DM</option>
+            <option value="Twitter / X DM">Twitter / X DM</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- VIDEO SCRIPT OPTIONS -->
+      <div id="videoOptions" style="display:none;">
+        <div class="form-row">
+          <div class="form-group">
+            <label>Platform</label>
+            <select id="videoPlatform">
+              <option value="TikTok">TikTok</option>
+              <option value="Instagram Reels">Instagram Reels</option>
+              <option value="YouTube Shorts">YouTube Shorts</option>
+              <option value="YouTube">YouTube</option>
+              <option value="Facebook">Facebook</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Video length</label>
+            <select id="videoLength">
+              <option value="15 seconds">15 seconds</option>
+              <option value="30 seconds">30 seconds</option>
+              <option value="60 seconds" selected>60 seconds</option>
+              <option value="3 minutes">3 minutes</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- BIO OPTIONS -->
+      <div id="bioOptions" style="display:none;">
+        <div class="form-group">
+          <label>Placement</label>
+          <select id="bioPlacement">
+            <option value="LinkedIn bio">LinkedIn bio</option>
+            <option value="Instagram bio">Instagram bio (150 chars max)</option>
+            <option value="website about page">Website about page</option>
+            <option value="speaker bio">Speaker bio</option>
+            <option value="Twitter / X bio">Twitter / X bio (160 chars max)</option>
+            <option value="email signature">Email signature</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- SEQUENCE OPTIONS - only shown for email sequence tool -->
+      <div id="sequenceOptions" style="display:none;gap:12px;flex-direction:column;">
+        <div class="form-row">
+          <div class="form-group">
+            <label>Sequence type</label>
+            <select id="sequenceType">
+              <option value="welcome">Welcome sequence — onboard new subscribers</option>
+              <option value="promotional">Promotional — sell a product or offer</option>
+              <option value="nurture">Nurture — build trust and relationship</option>
+              <option value="reengagement">Re-engagement — win back cold leads</option>
+              <option value="postpurchase">Post-purchase — follow up after buying</option>
+              <option value="launch">Launch sequence — build up to a launch</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Number of emails</label>
+            <select id="sequenceCount">
+              <option value="3">3 emails</option>
+              <option value="5" selected>5 emails</option>
+              <option value="7">7 emails</option>
+            </select>
+          </div>
+        </div>
+      </div>
       <button class="generate-btn" id="genBtn" onclick="generate()">
         <span id="btnLabel">Generate copy</span>
       </button>
@@ -440,12 +607,14 @@ const sbClient=window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON);
 
 const FREE_LIMIT=20;
 const TOOLS={
-  ad:     {title:'Ad Copy',           sub:'Generate 4 high-converting ad variants for Facebook, Instagram & Google',count:4, free:true,
-            ctas:['Shop now','Start free trial','Book a free call','Get 50% off','Learn more','Claim your spot']},
-  email:  {title:'Email Subject Lines',sub:'Generate 6 subject lines engineered for high open rates',count:6, free:true,
+  email:  {title:'Email Subject Lines',sub:'Generate 6 subject lines tailored to your email goal',count:6, free:true,
             ctas:['Open to find out','Click to claim','See inside','Reply to this email','Do not miss this','Get the details']},
-  social: {title:'Social Media Posts', sub:'Generate 4 platform-native captions with hashtags',count:4, free:true,
+  social: {title:'Social Media Posts', sub:'Generate 4 platform-native captions tailored to your chosen platform',count:4, free:true,
             ctas:['Link in bio','Comment below','Tag someone','Save this post','DM me to learn more','Share with a friend']},
+  cta:    {title:'CTA Buttons',        sub:'Generate 6 high-converting call-to-action button texts',count:6, free:true,
+            ctas:['Start free','Book now','Get started','Learn more','Shop now','Contact us']},
+  ad:     {title:'Ad Copy',            sub:'Generate 4 high-converting ad variants tailored to your chosen platform',count:4, free:false,
+            ctas:['Shop now','Start free trial','Book a free call','Get 50% off','Learn more','Claim your spot']},
   product:{title:'Product Description',sub:'Generate 3 sensory, benefit-first product descriptions',count:3, free:false,
             ctas:['Add to cart','Shop the collection','Order yours today','Limited stock — get yours','Buy now','Explore the range']},
   tagline:{title:'Taglines & Slogans', sub:'Generate 6 memorable brand taglines',count:6, free:false,
@@ -456,8 +625,8 @@ const TOOLS={
             ctas:['Link in bio','Comment below','Subscribe now','Follow for more','Check out the website','DM me']},
   bio:    {title:'Bio / About Page',   sub:'Generate 3 compelling bio or about page variants',count:3, free:false,
             ctas:['Book a call','Work with me','Get in touch','See my work','Download my guide','Join my newsletter']},
-  cta:    {title:'CTA Buttons',        sub:'Generate 6 high-converting call-to-action button texts',count:6, free:false,
-            ctas:['Start free','Book now','Get started','Learn more','Shop now','Contact us']},
+  sequence:{title:'Email Sequence',    sub:'Generate a complete nurture email sequence with subject lines and full email bodies',count:5, free:false,
+            ctas:['Book a call','Start your free trial','Join the program','Download the guide','Get in touch','Sign up now']},
 };
 
 const isPro = () => localStorage.getItem('ck_pro') === 'true';
@@ -477,7 +646,7 @@ const CHAR_LIMITS={
   ad:150, email:60, product:0, social:280, tagline:60, cold:200, video:0, bio:0, cta:30
 };
 
-let currentTool='ad';
+let currentTool='email';
 let results=[];
 let usageLeft=parseInt(localStorage.getItem('ck_usage')||FREE_LIMIT);
 let sessionHistory=[];
@@ -519,6 +688,23 @@ function selectTool(el){
   document.getElementById('mainTitle').textContent=t.title;
   document.getElementById('mainSub').textContent=t.sub;
   renderCTASuggestions(tool);
+  // Show/hide all tool-specific options
+  const optPanels={
+    sequenceOptions: tool==='sequence'?'flex':'none',
+    platformOptions: tool==='social'?'block':'none',
+    adOptions:       tool==='ad'?'block':'none',
+    emailOptions:    tool==='email'?'block':'none',
+    ctaOptions:      tool==='cta'?'block':'none',
+    productOptions:  tool==='product'?'block':'none',
+    taglineOptions:  tool==='tagline'?'block':'none',
+    coldOptions:     tool==='cold'?'block':'none',
+    videoOptions:    tool==='video'?'block':'none',
+    bioOptions:      tool==='bio'?'block':'none',
+  };
+  Object.entries(optPanels).forEach(([id,display])=>{
+    const el=document.getElementById(id);
+    if(el) el.style.display=display;
+  });
   clearResults();
 }
 
@@ -848,7 +1034,7 @@ window.addEventListener('load',async()=>{
   try{ updateUsageDisplay(); }catch(e){}
   try{ updateTonePreview(); }catch(e){}
   try{ renderProfileSelect(); }catch(e){}
-  try{ renderCTASuggestions('ad'); }catch(e){}
+  try{ renderCTASuggestions('email'); }catch(e){}
   try{
     const{data:{session}}=await sbClient.auth.getSession();
     if(session){showApp(session.user);}

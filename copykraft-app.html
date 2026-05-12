@@ -585,9 +585,18 @@ async function generate(){
       updateUsageDisplay();
       addToHistory();
     }
-    renderResults(text);
+    try{
+      renderResults(text);
+    }catch(renderErr){
+      // If parsing fails, show raw text cleaned up
+      const cleaned=text.replace(/\*\*/g,'').replace(/^#+\s*/gm,'').trim();
+      results=[cleaned];
+      document.getElementById('resultsTitle').textContent='Output';
+      document.getElementById('copyAllBtn').style.display='inline-block';
+      document.getElementById('resultsBody').innerHTML=`<div class="results-grid"><div class="result-card"><span class="result-num">01</span><span class="result-text" style="white-space:pre-line;">${cleaned}</span><button class="result-copy" onclick="navigator.clipboard.writeText('${cleaned.replace(/'/g,"\\'")}')">Copy</button></div></div>`;
+    }
   }catch(e){
-    document.getElementById('resultsBody').innerHTML='<div class="error-box">Something went wrong — please try again.</div>';
+    document.getElementById('resultsBody').innerHTML='<div class="error-box">Something went wrong — please try again. ('+e.message+')</div>';
   }
   btn.disabled=false;
   lbl.textContent='Generate copy';
@@ -611,30 +620,39 @@ async function regenerateOne(idx){
 }
 
 function renderResults(text){
+  // Strip all markdown first
+  const cleaned = text
+    .replace(/\*\*/g,'')
+    .replace(/\*/g,'')
+    .replace(/^#+\s*/gm,'')
+    .trim();
+
   // Primary: split by separator
   const SEP='---VARIANT---';
-  let parts=text.split(SEP).map(s=>s.replace(/\*\*/g,'').replace(/^#+\s*/gm,'').replace(/^\d+[\.\):\-]\s*/,'').trim()).filter(s=>s.length>10);
+  let parts=cleaned.split(SEP).map(s=>s.replace(/^\d+[\.\):\-]\s*/,'').trim()).filter(s=>s.length>10);
 
   // Fallback: numbered list parsing
   if(parts.length<=1){
-    const lines=text.split('\n').filter(l=>l.trim());
+    const lines=cleaned.split('\n').filter(l=>l.trim());
     parts=[];
     let cur='';
     for(const line of lines){
-      const clean=line.replace(/\*\*/g,'').replace(/^#+\s*/,'').trim();
-      if(/^(.*)(variants|usps?|copy options|subject lines|taglines|outreach|scripts|captions|descriptions)(\s*for\s*.*)?$/i.test(clean)&&clean.length<80) continue;
-      if(/^\*{0,2}\d+[\.\):\-]/.test(clean)){
+      if(/^(.*)(variants|usps?|copy options|subject lines|taglines|outreach|scripts|captions|descriptions)(\s*for\s*.*)?$/i.test(line)&&line.length<80) continue;
+      if(/^\d+[\.\):\-]/.test(line)){
         if(cur) parts.push(cur.trim());
-        cur=clean.replace(/^\*{0,2}\d+[\.\):\-]\s*/,'').trim();
+        cur=line.replace(/^\d+[\.\):\-]\s*/,'').trim();
       } else if(cur){
-        cur+='\n'+clean;
+        cur+='\n'+line;
+      } else {
+        cur=line;
       }
     }
     if(cur) parts.push(cur.trim());
   }
 
+  // Last resort — just show the whole thing
   results=parts.filter(p=>p.length>0);
-  if(!results.length) results=[text.replace(/\*\*/g,'').trim()];
+  if(!results.length) results=[cleaned];
 
   const t=TOOLS[currentTool];
   const freeLimit=(!isPro() && t.free) ? FREE_VARIANTS : results.length;

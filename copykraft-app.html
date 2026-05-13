@@ -1243,7 +1243,7 @@ async function handleAuth(){
     const{error}=await sbClient.auth.signUp({email,password});
     if(error){errEl.textContent=error.message;errEl.style.display='block';}
     else{
-      sucEl.textContent='Account created! Check your email to confirm, then sign in.';
+      sucEl.textContent='Account created! Sign in below to get started.';
       sucEl.style.display='block';
       addToMailerLite(email);
       // Create profile in Supabase immediately

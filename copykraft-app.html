@@ -651,8 +651,7 @@ async function checkProStatus(userId, email) {
     if (data && data[0]) {
       _isProCache = data[0].is_pro === true;
       localStorage.setItem('ck_pro', _isProCache ? 'true' : 'false');
-      const upgradeBtn = document.querySelector('.upgrade-btn');
-      if(upgradeBtn) upgradeBtn.style.display = _isProCache ? 'none' : 'inline-flex';
+      updateProUI();
       if(_isProCache) console.log('Pro access granted!');
     }
   } catch(e) {
@@ -1285,6 +1284,34 @@ function showApp(user){
   loadProfilesFromSupabase();
   // Store user for refresh
   window._currentUser = user;
+  // Update UI based on cached pro status
+  updateProUI();
+}
+
+function updateProUI(){
+  // Hide/show upgrade button
+  const upgradeBtn=document.querySelector('.upgrade-btn');
+  if(upgradeBtn) upgradeBtn.style.display=isPro()?'none':'inline-flex';
+  // Hide/show usage pill
+  const usagePill=document.querySelector('.usage-pill');
+  if(usagePill) usagePill.style.display=isPro()?'none':'flex';
+  // Hide Pro badges on tools if Pro
+  document.querySelectorAll('.pro-badge').forEach(b=>{
+    b.style.display=isPro()?'none':'inline-block';
+  });
+  // Remove lock icon from Pro Tools label
+  const proLabel=document.querySelector('.sidebar-label:last-of-type');
+  document.querySelectorAll('.sidebar-label').forEach(l=>{
+    if(l.textContent.includes('Pro Tools')){
+      l.textContent=isPro()?'Pro Tools ✓':'Pro Tools 🔒';
+    }
+  });
+  // Make all tool items clickable if Pro
+  if(isPro()){
+    document.querySelectorAll('.tool-item.pro-tool').forEach(t=>{
+      t.style.opacity='1';
+    });
+  }
 }
 
 async function refreshProStatus(){

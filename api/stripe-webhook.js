@@ -18,7 +18,6 @@ async function verifyStripeSignature(rawBody, signature, secret) {
   const parts = signature.split(',');
   const timestamp = parts.find(p => p.startsWith('t=')).split('=')[1];
   const v1 = parts.find(p => p.startsWith('v1=')).split('=')[1];
-
   const signedPayload = `${timestamp}.${rawBody.toString('utf8')}`;
   const key = await crypto.subtle.importKey(
     'raw', encoder.encode(secret), { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']
@@ -28,18 +27,44 @@ async function verifyStripeSignature(rawBody, signature, secret) {
   return computedSig === v1;
 }
 
+async function getSupabaseUserId(email) {
+  // Look up user ID from auth.users via service role
+  const res = await fetch(
+    `${SUPABASE_URL}/auth/v1/admin/users`,
+    {
+      headers: {
+        'apikey': SUPABASE_SERVICE_KEY,
+        'Authorization': `Bearer ${SUPABASE_SERVICE_KEY}`
+      }
+    }
+  );
+  const data = await res.json();
+  const user = data.users?.find(u => u.email === email);
+  return user?.id || null;
+}
+
 async function setProStatus(email, isPro) {
-  const res = await fetch(`${SUPABASE_URL}/rest/v1/profiles?email=eq.${encodeURIComponent(email)}`, {
-    method: 'PATCH',
-    headers: {
-      'Content-Type': 'application/json',
-      'apikey': SUPABASE_SERVICE_KEY,
-      'Authorization': `Bearer ${SUPABASE_SERVICE_KEY}`,
-      'Prefer': 'return=minimal'
-    },
-    body: JSON.stringify({ is_pro: isPro })
-  });
-  return res.ok;
+  // First get the user's Supabase ID
+  const userId = await getSupabaseUserId(email);
+  
+  if (userId) {
+    // Upsert profile — creates if not exists, updates if exists
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/profiles`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'apikey': SUPABASE_SERVICE_KEY,
+        'Authorization': `Bearer ${SUPABASE_SERVICE_KEY}`,
+        'Prefer': 'resolution=merge-duplicates'
+      },
+      body: JSON.stringify({ id: userId, email, is_pro: isPro })
+    });
+    console.log('Upsert status:', res.status, 'for', email, 'isPro:', isPro);
+    return res.ok;
+  } else {
+    console.log('No Supabase user found for email:', email);
+    return false;
+  }
 }
 
 export default async function handler(req, res) {
@@ -74,7 +99,6 @@ export default async function handler(req, res) {
 
     if (event.type === 'customer.subscription.created') {
       const subscription = event.data.object;
-      // Get customer email from Stripe
       const customerRes = await fetch(`https://api.stripe.com/v1/customers/${subscription.customer}`, {
         headers: { 'Authorization': `Bearer ${process.env.STRIPE_SECRET_KEY}` }
       });

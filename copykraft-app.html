@@ -1242,7 +1242,14 @@ async function handleAuth(){
   if(isSignup){
     const{error}=await sbClient.auth.signUp({email,password});
     if(error){errEl.textContent=error.message;errEl.style.display='block';}
-    else{sucEl.textContent='Account created! Check your email to confirm, then sign in.';sucEl.style.display='block';addToMailerLite(email);toggleAuthMode();}
+    else{
+      sucEl.textContent='Account created! Check your email to confirm, then sign in.';
+      sucEl.style.display='block';
+      addToMailerLite(email);
+      // Create profile in Supabase immediately
+      await createUserProfile(email);
+      toggleAuthMode();
+    }
   } else {
     const{data,error}=await sbClient.auth.signInWithPassword({email,password});
     if(error){errEl.textContent=error.message;errEl.style.display='block';}
@@ -1281,6 +1288,30 @@ async function signOut(){
   await sbClient.auth.signOut();
   document.getElementById('loginGate').style.display='flex';
   document.getElementById('userEmail').textContent='';
+}
+
+async function createUserProfile(email){
+  try{
+    // Wait a moment for Supabase auth to complete
+    await new Promise(r=>setTimeout(r,1000));
+    const{data:{session}}=await sbClient.auth.getSession();
+    if(!session) return;
+    const userId=session.user.id;
+    // Insert profile row
+    const res=await fetch(`${SUPABASE_URL}/rest/v1/profiles`,{
+      method:'POST',
+      headers:{
+        'Content-Type':'application/json',
+        'apikey':SUPABASE_ANON,
+        'Authorization':`Bearer ${session.access_token}`,
+        'Prefer':'resolution=ignore-duplicates'
+      },
+      body:JSON.stringify({id:userId,email,is_pro:false})
+    });
+    console.log('Profile created for',email,'status:',res.status);
+  }catch(e){
+    console.log('Profile creation error:',e);
+  }
 }
 
 async function addToMailerLite(email){

@@ -629,7 +629,32 @@ const TOOLS={
             ctas:['Book a call','Start your free trial','Join the program','Download the guide','Get in touch','Sign up now']},
 };
 
-const isPro = () => localStorage.getItem('ck_pro') === 'true';
+let _isProCache = localStorage.getItem('ck_pro') === 'true';
+const isPro = () => _isProCache;
+
+async function checkProStatus(userId, email) {
+  try {
+    const res = await fetch(
+      `https://cwzvnlwbotgwjlxagglp.supabase.co/rest/v1/profiles?id=eq.${userId}&select=is_pro`,
+      {
+        headers: {
+          'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN3enZubHdib3Rnd2pseGFnZ2xwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc2NTk5MjAsImV4cCI6MjA5MzIzNTkyMH0.mi8_q-pKkbVREgNzjoaF3GPQSOsqV15aIPnOKWiTenA',
+          'Authorization': `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN3enZubHdib3Rnd2pseGFnZ2xwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc2NTk5MjAsImV4cCI6MjA5MzIzNTkyMH0.mi8_q-pKkbVREgNzjoaF3GPQSOsqV15aIPnOKWiTenA`
+        }
+      }
+    );
+    const data = await res.json();
+    if (data && data[0]) {
+      _isProCache = data[0].is_pro === true;
+      localStorage.setItem('ck_pro', _isProCache ? 'true' : 'false');
+      // Update upgrade button visibility
+      const upgradeBtn = document.querySelector('.upgrade-btn');
+      if(upgradeBtn) upgradeBtn.style.display = _isProCache ? 'none' : 'inline-flex';
+    }
+  } catch(e) {
+    console.log('Could not check pro status:', e);
+  }
+}
 const FREE_VARIANTS = 2;
 
 const TONE_PREVIEWS={
@@ -1210,6 +1235,8 @@ function showApp(user){
   document.getElementById('loginGate').style.display='none';
   const emailEl=document.getElementById('userEmail');
   if(emailEl) emailEl.textContent=user.email;
+  // Check Pro status from Supabase
+  checkProStatus(user.id, user.email);
 }
 
 async function signOut(){

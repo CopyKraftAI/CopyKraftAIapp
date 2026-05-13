@@ -27,44 +27,61 @@ async function verifyStripeSignature(rawBody, signature, secret) {
   return computedSig === v1;
 }
 
-async function getSupabaseUserId(email) {
-  // Look up user ID from auth.users via service role
-  const res = await fetch(
-    `${SUPABASE_URL}/auth/v1/admin/users`,
+async function activatePro(email, isPro) {
+  console.log('Attempting to set is_pro=' + isPro + ' for ' + email);
+
+  // Step 1: Get user ID from Supabase auth
+  const usersRes = await fetch(`${SUPABASE_URL}/auth/v1/admin/users?per_page=1000`, {
+    headers: {
+      'apikey': SUPABASE_SERVICE_KEY,
+      'Authorization': `Bearer ${SUPABASE_SERVICE_KEY}`
+    }
+  });
+  const usersData = await usersRes.json();
+  console.log('Total users found:', usersData.users?.length);
+  
+  const user = usersData.users?.find(u => u.email?.toLowerCase() === email.toLowerCase());
+  if (!user) {
+    console.log('ERROR: No user found for email:', email);
+    return false;
+  }
+  console.log('Found user ID:', user.id);
+
+  // Step 2: Update existing profile
+  const updateRes = await fetch(
+    `${SUPABASE_URL}/rest/v1/profiles?email=eq.${encodeURIComponent(email)}`,
     {
+      method: 'PATCH',
       headers: {
+        'Content-Type': 'application/json',
         'apikey': SUPABASE_SERVICE_KEY,
-        'Authorization': `Bearer ${SUPABASE_SERVICE_KEY}`
-      }
+        'Authorization': `Bearer ${SUPABASE_SERVICE_KEY}`,
+        'Prefer': 'return=representation'
+      },
+      body: JSON.stringify({ is_pro: isPro })
     }
   );
-  const data = await res.json();
-  const user = data.users?.find(u => u.email === email);
-  return user?.id || null;
-}
+  const updateData = await updateRes.json();
+  console.log('Update result:', JSON.stringify(updateData));
 
-async function setProStatus(email, isPro) {
-  // First get the user's Supabase ID
-  const userId = await getSupabaseUserId(email);
-  
-  if (userId) {
-    // Upsert profile — creates if not exists, updates if exists
-    const res = await fetch(`${SUPABASE_URL}/rest/v1/profiles`, {
+  // Step 3: If no rows updated, insert new profile
+  if (!updateData || updateData.length === 0) {
+    console.log('No existing profile found, inserting new one...');
+    const insertRes = await fetch(`${SUPABASE_URL}/rest/v1/profiles`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         'apikey': SUPABASE_SERVICE_KEY,
         'Authorization': `Bearer ${SUPABASE_SERVICE_KEY}`,
-        'Prefer': 'resolution=merge-duplicates'
+        'Prefer': 'return=representation'
       },
-      body: JSON.stringify({ id: userId, email, is_pro: isPro })
+      body: JSON.stringify({ id: user.id, email, is_pro: isPro })
     });
-    console.log('Upsert status:', res.status, 'for', email, 'isPro:', isPro);
-    return res.ok;
-  } else {
-    console.log('No Supabase user found for email:', email);
-    return false;
+    const insertData = await insertRes.json();
+    console.log('Insert result:', JSON.stringify(insertData));
   }
+
+  return true;
 }
 
 export default async function handler(req, res) {
@@ -79,51 +96,50 @@ export default async function handler(req, res) {
   try {
     valid = await verifyStripeSignature(rawBody, signature, STRIPE_WEBHOOK_SECRET);
   } catch (e) {
+    console.log('Sig error:', e.message);
     return res.status(400).json({ error: 'Signature verification failed' });
   }
 
   if (!valid) return res.status(400).json({ error: 'Invalid signature' });
 
   const event = JSON.parse(rawBody.toString('utf8'));
-  console.log('Stripe event:', event.type);
+  console.log('Stripe event received:', event.type);
 
   try {
+    let email = null;
+
     if (event.type === 'checkout.session.completed') {
       const session = event.data.object;
-      const email = session.customer_details?.email || session.customer_email;
-      if (email) {
-        await setProStatus(email, true);
-        console.log('Pro activated for:', email);
-      }
+      email = session.customer_details?.email || session.customer_email;
+      console.log('Checkout email:', email);
+      if (email) await activatePro(email, true);
     }
 
     if (event.type === 'customer.subscription.created') {
-      const subscription = event.data.object;
-      const customerRes = await fetch(`https://api.stripe.com/v1/customers/${subscription.customer}`, {
+      const sub = event.data.object;
+      const customerRes = await fetch(`https://api.stripe.com/v1/customers/${sub.customer}`, {
         headers: { 'Authorization': `Bearer ${process.env.STRIPE_SECRET_KEY}` }
       });
       const customer = await customerRes.json();
-      if (customer.email) {
-        await setProStatus(customer.email, true);
-        console.log('Pro activated for:', customer.email);
-      }
+      email = customer.email;
+      console.log('Subscription created for:', email);
+      if (email) await activatePro(email, true);
     }
 
     if (event.type === 'customer.subscription.deleted') {
-      const subscription = event.data.object;
-      const customerRes = await fetch(`https://api.stripe.com/v1/customers/${subscription.customer}`, {
+      const sub = event.data.object;
+      const customerRes = await fetch(`https://api.stripe.com/v1/customers/${sub.customer}`, {
         headers: { 'Authorization': `Bearer ${process.env.STRIPE_SECRET_KEY}` }
       });
       const customer = await customerRes.json();
-      if (customer.email) {
-        await setProStatus(customer.email, false);
-        console.log('Pro deactivated for:', customer.email);
-      }
+      email = customer.email;
+      console.log('Subscription cancelled for:', email);
+      if (email) await activatePro(email, false);
     }
 
     return res.status(200).json({ received: true });
   } catch (e) {
-    console.error('Webhook error:', e);
+    console.error('Webhook error:', e.message);
     return res.status(500).json({ error: e.message });
   }
 }

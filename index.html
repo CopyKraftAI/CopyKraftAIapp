@@ -92,7 +92,7 @@
   .author-role{font-size:12px;color:var(--text3)}
 
   /* PRICING */
-  .pricing-grid{display:flex;gap:16px;max-width:900px;margin:0 auto}
+  .pricing-grid{display:flex;gap:12px;max-width:1100px;margin:0 auto}
   .price-card{background:var(--bg2);border:0.5px solid var(--border2);border-radius:14px;padding:28px 24px;flex:1;position:relative}
   .price-card.featured{border-color:var(--gold);border-width:1.5px;background:var(--bg4)}
   .price-popular{position:absolute;top:-12px;left:50%;transform:translateX(-50%);background:var(--gold);color:#fff;font-size:11px;font-weight:500;padding:3px 14px;border-radius:20px;white-space:nowrap}
@@ -142,7 +142,7 @@
     .steps{grid-template-columns:1fr 1fr}
     .features-grid{grid-template-columns:1fr}
     .testimonials-grid{grid-template-columns:1fr}
-    .pricing-grid{flex-direction:column}
+    .pricing-grid{flex-direction:column;max-width:100%}
     .stats-bar{grid-template-columns:repeat(2,1fr)}
     .footer-grid{grid-template-columns:1fr 1fr}
     nav .nav-links .nav-link{display:none}
@@ -318,41 +318,53 @@
     <div class="price-card">
       <div class="price-name">Free</div>
       <div class="price-amount">$0<span>/mo</span></div>
-      <div class="price-desc">Perfect for trying it out</div>
+      <div class="price-desc">Try it out — no card needed</div>
       <ul class="price-features">
         <li>20 free generations</li>
-        <li>3 copy tools (Ad Copy, Email Subjects, Social Posts)</li>
+        <li>3 copy tools</li>
         <li>2 variants per generation</li>
         <li>1 saved brand profile</li>
-        <li>All 7 tone settings</li>
       </ul>
       <a href="https://copykraftai.vercel.app/copykraft-app.html" class="price-btn price-btn-ghost">Get started free</a>
     </div>
     <div class="price-card featured">
       <div class="price-popular">Most popular</div>
+      <div class="price-name">Starter</div>
+      <div class="price-amount">$9<span>/mo</span></div>
+      <div class="price-desc">Less than one Starbucks coffee ☕</div>
+      <ul class="price-features">
+        <li>Unlimited generations</li>
+        <li>3 copy tools (Email Subjects, Social Posts, CTA Buttons)</li>
+        <li>4–6 variants per generation</li>
+        <li>1 saved brand profile</li>
+        <li>All 7 tone settings</li>
+      </ul>
+      <a href="https://buy.stripe.com/9B6cN7a4zdNQb8eeklfQI00" target="_blank" class="price-btn price-btn-gold">Start Starter — $9/mo</a>
+    </div>
+    <div class="price-card">
       <div class="price-name">Pro</div>
       <div class="price-amount">$29<span>/mo</span></div>
       <div class="price-desc">For serious business owners</div>
       <ul class="price-features">
         <li>Unlimited generations</li>
-        <li>All 9 copy tools</li>
+        <li>All 10 copy tools</li>
         <li>4–6 variants per generation</li>
         <li>Unlimited brand profiles</li>
         <li>All 7 tone settings</li>
         <li>Priority AI speed</li>
       </ul>
-      <a href="https://buy.stripe.com/9B6cN7a4zdNQb8eeklfQI00" target="_blank" class="price-btn price-btn-gold">Start Pro — $29/mo</a>
+      <a href="https://buy.stripe.com/9B6cN7a4zdNQb8eeklfQI00" target="_blank" class="price-btn price-btn-ghost">Start Pro — $29/mo</a>
     </div>
     <div class="price-card">
       <div class="price-name">Agency</div>
       <div class="price-amount">$99<span>/mo</span></div>
-      <div class="price-desc">For teams and agencies</div>
+      <div class="price-desc">For agencies managing multiple clients</div>
       <ul class="price-features">
         <li>Everything in Pro</li>
         <li>5 team seats</li>
-        <li>Client workspace</li>
         <li>Unlimited brand profiles</li>
-        <li>API access</li>
+        <li>Dedicated onboarding call</li>
+        <li>Early access to new features</li>
         <li>Priority support</li>
       </ul>
       <a href="https://buy.stripe.com/00wbJ3a4z258fou4JLfQI01" target="_blank" class="price-btn price-btn-ghost">Start Agency — $99/mo</a>

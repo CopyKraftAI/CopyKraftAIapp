@@ -938,34 +938,42 @@ function copyAll(){
   });
 }
 
-// BRAND PROFILES
+// BRAND PROFILES — Supabase backed
 const FREE_PROFILE_LIMIT = 1;
+let _profiles = []; // local cache
+let _currentProfileId = null;
 
-function getProfiles(){
-  return JSON.parse(localStorage.getItem('ck_profiles')||'[]');
-}
-
-function saveProfiles(profiles){
-  localStorage.setItem('ck_profiles', JSON.stringify(profiles));
+async function loadProfilesFromSupabase(){
+  try{
+    const{data:{session}}=await sbClient.auth.getSession();
+    if(!session) return;
+    const res=await fetch(`${SUPABASE_URL}/rest/v1/brand_profiles?user_id=eq.${session.user.id}&order=created_at.asc`,{
+      headers:{
+        'apikey':SUPABASE_ANON,
+        'Authorization':`Bearer ${session.access_token}`
+      }
+    });
+    const data=await res.json();
+    if(Array.isArray(data)){
+      _profiles=data;
+      renderProfileSelect();
+    }
+  }catch(e){ console.log('Error loading profiles:',e); }
 }
 
 function renderProfileSelect(){
-  const profiles = getProfiles();
-  const sel = document.getElementById('profileSelectMain');
-  const current = sel.value;
-  sel.innerHTML = '<option value="">— No profile loaded —</option>' +
-    profiles.map((p,i) => `<option value="${i}">${p.name}</option>`).join('');
-  if(current) sel.value = current;
-  // Update action buttons visibility
-  const idx = sel.value;
-  const actBtns = document.getElementById('profileActionBtns');
-  if(actBtns) actBtns.style.display = idx !== '' ? 'flex' : 'none';
+  const sel=document.getElementById('profileSelectMain');
+  if(!sel) return;
+  const current=sel.value;
+  sel.innerHTML='<option value="">— No profile loaded —</option>'+
+    _profiles.map(p=>`<option value="${p.id}">${p.name}</option>`).join('');
+  if(current) sel.value=current;
+  const actBtns=document.getElementById('profileActionBtns');
+  if(actBtns) actBtns.style.display=sel.value?'flex':'none';
 }
 
 function showSaveProfile(){
-  const profiles = getProfiles();
-  if(!isPro() && profiles.length >= FREE_PROFILE_LIMIT){
-    // Show upgrade modal
+  if(!isPro() && _profiles.length >= FREE_PROFILE_LIMIT){
     document.getElementById('upgradeModal').style.display='flex';
     document.querySelector('.modal-title').textContent='Upgrade for more profiles';
     document.querySelector('.modal-sub').textContent='Free accounts can save 1 brand profile. Upgrade to Pro to save unlimited profiles and switch between them instantly.';
@@ -982,76 +990,94 @@ function cancelSaveProfile(){
   document.getElementById('profileNameInput').value='';
 }
 
-function saveNamedProfile(){
-  const name = document.getElementById('profileNameInput').value.trim();
+async function saveNamedProfile(){
+  const name=document.getElementById('profileNameInput').value.trim();
   if(!name) return;
-  const profiles = getProfiles();
-  const profile = {
-    name,
-    brand: document.getElementById('brand').value,
-    product: document.getElementById('product').value,
-    audience: document.getElementById('audience').value,
-    tone: document.getElementById('tone').value,
-    usp: document.getElementById('usp').value,
-  };
-  // Check if name already exists — update it
-  const existing = profiles.findIndex(p => p.name.toLowerCase() === name.toLowerCase());
-  if(existing >= 0){ profiles[existing] = profile; } else { profiles.push(profile); }
-  saveProfiles(profiles);
-  renderProfileSelect();
-  // Select the saved profile
-  const idx = getProfiles().findIndex(p => p.name === name);
-  document.getElementById('profileSelectMain').value = idx;
-  cancelSaveProfile();
-  const msg = document.getElementById('profileSavedMsg');
-  msg.style.display='block';
-  setTimeout(()=>msg.style.display='none', 2000);
+  try{
+    const{data:{session}}=await sbClient.auth.getSession();
+    if(!session) return;
+    const profile={
+      user_id:session.user.id,
+      name,
+      brand:document.getElementById('brand').value,
+      product:document.getElementById('product').value,
+      audience:document.getElementById('audience').value,
+      tone:document.getElementById('tone').value,
+      usp:document.getElementById('usp').value,
+      cta:document.getElementById('cta')?document.getElementById('cta').value:''
+    };
+    // Check if name exists — update or insert
+    const existing=_profiles.find(p=>p.name.toLowerCase()===name.toLowerCase());
+    let res;
+    if(existing){
+      res=await fetch(`${SUPABASE_URL}/rest/v1/brand_profiles?id=eq.${existing.id}`,{
+        method:'PATCH',
+        headers:{'Content-Type':'application/json','apikey':SUPABASE_ANON,'Authorization':`Bearer ${session.access_token}`,'Prefer':'return=representation'},
+        body:JSON.stringify(profile)
+      });
+    } else {
+      res=await fetch(`${SUPABASE_URL}/rest/v1/brand_profiles`,{
+        method:'POST',
+        headers:{'Content-Type':'application/json','apikey':SUPABASE_ANON,'Authorization':`Bearer ${session.access_token}`,'Prefer':'return=representation'},
+        body:JSON.stringify(profile)
+      });
+    }
+    const saved=await res.json();
+    await loadProfilesFromSupabase();
+    // Select saved profile
+    if(saved&&saved[0]) document.getElementById('profileSelectMain').value=saved[0].id;
+    cancelSaveProfile();
+    const msg=document.getElementById('profileSavedMsg');
+    msg.style.display='block';
+    setTimeout(()=>msg.style.display='none',2000);
+  }catch(e){ console.log('Error saving profile:',e); }
 }
 
-function switchProfile(idx){
-  const actBtns = document.getElementById('profileActionBtns');
-  if(idx === ''){
-    if(actBtns) actBtns.style.display='none';
-    return;
-  }
+function switchProfile(id){
+  const actBtns=document.getElementById('profileActionBtns');
+  if(!id){ if(actBtns) actBtns.style.display='none'; return; }
   if(actBtns) actBtns.style.display='flex';
-  const profiles = getProfiles();
-  const p = profiles[parseInt(idx)];
+  const p=_profiles.find(p=>p.id===id);
   if(!p) return;
+  _currentProfileId=id;
   if(p.brand) document.getElementById('brand').value=p.brand;
   if(p.product) document.getElementById('product').value=p.product;
   if(p.audience) document.getElementById('audience').value=p.audience;
   if(p.tone) document.getElementById('tone').value=p.tone;
   if(p.usp) document.getElementById('usp').value=p.usp;
-  if(p.cta) document.getElementById('cta').value=p.cta;
+  const ctaEl=document.getElementById('cta');
+  if(ctaEl&&p.cta) ctaEl.value=p.cta;
   updateTonePreview();
 }
 
-function deleteProfile(){
-  const sel = document.getElementById('profileSelectMain');
-  const idx = parseInt(sel.value);
-  if(isNaN(idx)) return;
-  const profiles = getProfiles();
-  const name = profiles[idx].name;
-  if(!confirm('Delete profile "'+name+'"?')) return;
-  profiles.splice(idx, 1);
-  saveProfiles(profiles);
-  renderProfileSelect();
-  // Clear fields
-  document.getElementById('brand').value='';
-  document.getElementById('product').value='';
-  document.getElementById('audience').value='';
-  document.getElementById('usp').value='';
-  document.getElementById('cta').value='';
+async function deleteProfile(){
+  const sel=document.getElementById('profileSelectMain');
+  const id=sel.value;
+  if(!id) return;
+  const p=_profiles.find(p=>p.id===id);
+  if(!p||!confirm('Delete profile "'+p.name+'"?')) return;
+  try{
+    const{data:{session}}=await sbClient.auth.getSession();
+    await fetch(`${SUPABASE_URL}/rest/v1/brand_profiles?id=eq.${id}`,{
+      method:'DELETE',
+      headers:{'apikey':SUPABASE_ANON,'Authorization':`Bearer ${session.access_token}`}
+    });
+    await loadProfilesFromSupabase();
+    document.getElementById('brand').value='';
+    document.getElementById('product').value='';
+    document.getElementById('audience').value='';
+    document.getElementById('usp').value='';
+    const ctaEl=document.getElementById('cta');
+    if(ctaEl) ctaEl.value='';
+  }catch(e){ console.log('Error deleting profile:',e); }
 }
 
 function editProfile(){
-  const sel = document.getElementById('profileSelectMain');
-  const idx = parseInt(sel.value);
-  if(isNaN(idx)) return;
-  const profiles = getProfiles();
-  const p = profiles[idx];
-  // Load into save bar with existing name for overwrite
+  const sel=document.getElementById('profileSelectMain');
+  const id=sel.value;
+  if(!id) return;
+  const p=_profiles.find(p=>p.id===id);
+  if(!p) return;
   document.getElementById('profileBarView').style.display='none';
   document.getElementById('profileBarSave').style.display='flex';
   document.getElementById('profileNameInput').value=p.name;
@@ -1062,7 +1088,7 @@ function editProfile(){
 window.addEventListener('load',async()=>{
   try{ updateUsageDisplay(); }catch(e){}
   try{ updateTonePreview(); }catch(e){}
-  try{ renderProfileSelect(); }catch(e){}
+  // Profiles loaded after login from Supabase
   try{ renderCTASuggestions('email'); }catch(e){}
   try{
     const{data:{session}}=await sbClient.auth.getSession();
@@ -1088,17 +1114,7 @@ window.addEventListener('load',async()=>{
   }catch(e){
     document.getElementById('loginGate').style.display='flex';
   }
-  try{
-    const oldProfile=localStorage.getItem('ck_profile');
-    if(oldProfile&&getProfiles().length===0){
-      const p=JSON.parse(oldProfile);
-      if(p.brand){
-        saveProfiles([{name:p.brand||'My Brand',brand:p.brand,product:p.product||'',audience:p.audience||'',tone:p.tone||'Professional',usp:''}]);
-        renderProfileSelect();
-        localStorage.removeItem('ck_profile');
-      }
-    }
-  }catch(e){}
+
 });
 
 // SESSION HISTORY
@@ -1265,6 +1281,8 @@ function showApp(user){
   if(emailEl) emailEl.textContent=user.email;
   // Check Pro status from Supabase
   checkProStatus(user.id, user.email);
+  // Load profiles from Supabase
+  loadProfilesFromSupabase();
   // Store user for refresh
   window._currentUser = user;
 }

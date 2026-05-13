@@ -8,40 +8,46 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap" rel="stylesheet">
 <style>
-  :root { --gold:#C8821A;--gold-light:#E8A030;--bg:#0E0D0B;--bg3:#1A1814;--bg4:#211F1A;--text:#F0EDE6;--text2:#A09880;--text3:#5A5446;--border:rgba(200,130,26,0.18);--border2:rgba(200,130,26,0.07);--serif:'DM Serif Display',Georgia,serif;--sans:'DM Sans',system-ui,sans-serif;--radius:10px; }
+  :root{--gold:#BA7517;--gold-light:#D4900A;--bg:#FFFDF8;--bg2:#FFFFFF;--bg3:#FEF8ED;--bg4:#FEF3E2;--text:#2A2015;--text2:#7A6A50;--text3:#A09070;--border2:#F0E8D8;--serif:'DM Serif Display',Georgia,serif;--sans:'DM Sans',system-ui,sans-serif;--radius:10px;}
   *{box-sizing:border-box;margin:0;padding:0}
   body{font-family:var(--sans);background:var(--bg);color:var(--text);line-height:1.7;min-height:100vh;display:flex;flex-direction:column}
-  nav{display:flex;align-items:center;justify-content:space-between;padding:0 5vw;height:64px;background:rgba(14,13,11,0.9);border-bottom:1px solid var(--border2);position:sticky;top:0;z-index:100;backdrop-filter:blur(12px)}
-  .nav-logo{font-family:var(--serif);font-size:19px;color:var(--text);text-decoration:none}
-  .nav-logo span{color:var(--gold)}
-  .nav-back{font-size:13px;color:var(--text3);text-decoration:none}
+  nav{display:flex;align-items:center;justify-content:space-between;padding:0 5vw;height:64px;background:rgba(255,253,248,0.95);border-bottom:0.5px solid var(--border2);position:sticky;top:0;z-index:100;backdrop-filter:blur(12px);box-shadow:0 1px 3px rgba(186,117,23,0.06)}
+  .nav-logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+  .nav-logo-icon{width:28px;height:28px;background:var(--gold);border-radius:6px;display:flex;align-items:center;justify-content:center}
+  .nav-logo-icon svg{width:14px;height:14px;fill:#fff}
+  .nav-logo-text{font-family:var(--serif);font-size:18px;color:var(--text);font-weight:500}
+  .nav-logo-text span{color:var(--gold);font-style:italic}
+  .nav-back{font-size:13px;color:var(--text2);text-decoration:none;transition:color 0.2s}
   .nav-back:hover{color:var(--gold)}
   .content{max-width:560px;margin:0 auto;padding:60px 5vw 100px;flex:1}
-  .page-label{font-size:12px;color:var(--gold);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:12px}
-  h1{font-family:var(--serif);font-size:42px;margin-bottom:12px;line-height:1.1}
-  .sub{font-size:16px;color:var(--text2);margin-bottom:48px;font-weight:300;line-height:1.65}
-  .form-group{display:flex;flex-direction:column;gap:6px;margin-bottom:20px}
+  .page-label{font-size:11px;color:var(--gold);text-transform:uppercase;letter-spacing:1px;margin-bottom:12px;font-weight:500}
+  h1{font-family:var(--serif);font-size:40px;margin-bottom:12px;color:var(--text);font-weight:500}
+  .sub{font-size:16px;color:var(--text2);margin-bottom:40px;font-weight:300;line-height:1.65}
+  .form-group{display:flex;flex-direction:column;gap:5px;margin-bottom:16px}
   label{font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:0.5px;font-weight:500}
-  input,select,textarea{background:var(--bg3);border:1px solid var(--border2);color:var(--text);border-radius:var(--radius);padding:12px 14px;font-family:var(--sans);font-size:15px;outline:none;transition:border-color 0.15s;width:100%}
+  input,select,textarea{background:var(--bg2);border:0.5px solid #D8C8A8;color:var(--text);border-radius:var(--radius);padding:11px 14px;font-family:var(--sans);font-size:15px;outline:none;transition:border-color 0.15s;width:100%}
   input::placeholder,textarea::placeholder{color:var(--text3)}
-  input:focus,select:focus,textarea:focus{border-color:var(--gold)}
-  select option{background:var(--bg3)}
+  input:focus,select:focus,textarea:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(186,117,23,0.08)}
+  select option{background:var(--bg2)}
   textarea{resize:vertical;min-height:140px;line-height:1.6}
-  .submit-btn{background:var(--gold);color:#0E0D0B;border:none;padding:14px 32px;border-radius:var(--radius);font-size:15px;font-weight:500;cursor:pointer;transition:all 0.2s;width:100%;margin-top:8px}
-  .submit-btn:hover{background:var(--gold-light)}
-  .submit-btn:disabled{opacity:0.5;cursor:not-allowed}
-  .success-box{background:rgba(80,160,40,0.1);border:1px solid rgba(80,160,40,0.3);border-radius:var(--radius);padding:16px;font-size:15px;color:#7ABA50;display:none;margin-top:16px}
-  .error-box{background:rgba(160,40,40,0.1);border:1px solid rgba(160,40,40,0.3);border-radius:var(--radius);padding:16px;font-size:15px;color:#D08080;display:none;margin-top:16px}
-  .direct-email{margin-top:40px;padding-top:32px;border-top:1px solid var(--border2);font-size:14px;color:var(--text3)}
+  .submit-btn{background:var(--gold);color:#fff;border:none;padding:13px 32px;border-radius:var(--radius);font-size:15px;font-weight:500;cursor:pointer;transition:all 0.2s;width:100%;margin-top:8px;box-shadow:0 4px 14px rgba(186,117,23,0.3)}
+  .submit-btn:hover{background:var(--gold-light);transform:translateY(-1px)}
+  .submit-btn:disabled{opacity:0.5;cursor:not-allowed;transform:none}
+  .success-box{background:rgba(80,160,40,0.08);border:0.5px solid rgba(80,160,40,0.3);border-radius:var(--radius);padding:16px;font-size:15px;color:#3B6D11;display:none;margin-top:16px}
+  .error-box{background:#FFF0F0;border:0.5px solid #F5C0C0;border-radius:var(--radius);padding:16px;font-size:15px;color:#C04040;display:none;margin-top:16px}
+  .direct-email{margin-top:40px;padding-top:32px;border-top:0.5px solid var(--border2);font-size:14px;color:var(--text3)}
   .direct-email a{color:var(--gold)}
-  footer{padding:32px 5vw;border-top:1px solid var(--border2);text-align:center;font-size:12px;color:var(--text3)}
-  footer a{color:var(--text3);text-decoration:none}
+  footer{padding:32px 5vw;border-top:0.5px solid var(--border2);background:var(--bg2);text-align:center;font-size:12px;color:var(--text3)}
+  footer a{color:var(--text3);text-decoration:none;margin:0 8px}
   footer a:hover{color:var(--gold)}
 </style>
 </head>
 <body>
 <nav>
-  <a href="https://copykraftai.vercel.app" class="nav-logo">Copy<span>Kraft</span> AI</a>
+  <a href="https://copykraftai.vercel.app" class="nav-logo">
+    <div class="nav-logo-icon"><svg viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zm17.71-10.21a1 1 0 0 0 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg></div>
+    <span class="nav-logo-text">Copy<span>Kraft</span> AI</span>
+  </a>
   <a href="https://copykraftai.vercel.app" class="nav-back">← Back to home</a>
 </nav>
 
@@ -52,11 +58,11 @@
 
   <div class="form-group">
     <label>Your name</label>
-    <input type="text" id="contactName" placeholder="Jane Smith" />
+    <input type="text" id="contactName" placeholder="Jane Smith"/>
   </div>
   <div class="form-group">
     <label>Email address</label>
-    <input type="email" id="contactEmail" placeholder="jane@company.com" />
+    <input type="email" id="contactEmail" placeholder="jane@company.com"/>
   </div>
   <div class="form-group">
     <label>Subject</label>
@@ -76,14 +82,16 @@
 
   <button class="submit-btn" id="submitBtn" onclick="sendMessage()">Send message</button>
   <div class="success-box" id="successBox">✓ Message sent! We'll get back to you within 24 hours.</div>
-  <div class="error-box" id="errorBox">Something went wrong. Please try emailing us directly at copykraftai@gmail.com</div>
+  <div class="error-box" id="errorBox">Something went wrong. Please email us directly at copykraftai@gmail.com</div>
 
   <div class="direct-email">
-    Prefer email? Reach us directly at <a href="mailto:copykraftai@gmail.com">copykraftai@gmail.com</a>
+    Prefer email? Reach us at <a href="mailto:copykraftai@gmail.com">copykraftai@gmail.com</a>
   </div>
 </div>
 
-<footer>© 2026 CopyKraft AI · <a href="/privacy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/contact.html">Contact</a></footer>
+<footer>
+  © 2026 CopyKraft AI · <a href="/privacy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/contact.html">Contact</a>
+</footer>
 
 <script>
 async function sendMessage() {
@@ -94,41 +102,22 @@ async function sendMessage() {
   const btn = document.getElementById('submitBtn');
   const successBox = document.getElementById('successBox');
   const errorBox = document.getElementById('errorBox');
-
-  successBox.style.display = 'none';
-  errorBox.style.display = 'none';
-
-  if (!name || !email || !message) {
-    errorBox.textContent = 'Please fill in all fields.';
-    errorBox.style.display = 'block';
-    return;
+  successBox.style.display='none'; errorBox.style.display='none';
+  if(!name||!email||!message){errorBox.textContent='Please fill in all fields.';errorBox.style.display='block';return;}
+  btn.disabled=true; btn.textContent='Sending...';
+  try{
+    const res=await fetch('/api/contact',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name,email,subject,message})});
+    if(res.ok){
+      successBox.style.display='block';
+      document.getElementById('contactName').value='';
+      document.getElementById('contactEmail').value='';
+      document.getElementById('contactMessage').value='';
+    } else throw new Error('Failed');
+  }catch(e){
+    errorBox.textContent='Something went wrong. Please email us directly at copykraftai@gmail.com';
+    errorBox.style.display='block';
   }
-
-  btn.disabled = true;
-  btn.textContent = 'Sending...';
-
-  try {
-    const res = await fetch('/api/contact', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name, email, subject, message })
-    });
-
-    if (res.ok) {
-      successBox.style.display = 'block';
-      document.getElementById('contactName').value = '';
-      document.getElementById('contactEmail').value = '';
-      document.getElementById('contactMessage').value = '';
-    } else {
-      throw new Error('Failed');
-    }
-  } catch(e) {
-    errorBox.textContent = 'Something went wrong. Please email us directly at copykraftai@gmail.com';
-    errorBox.style.display = 'block';
-  }
-
-  btn.disabled = false;
-  btn.textContent = 'Send message';
+  btn.disabled=false; btn.textContent='Send message';
 }
 </script>
 </body>
